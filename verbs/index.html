@@ -1,0 +1,2193 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VerbMaster – Morfología verbal española</title>
+<style>
+/* ═══════════════════════════════════════════════════════════
+   VARIABLES DE TEMA
+═══════════════════════════════════════════════════════════ */
+:root {
+  --bg:         #eef0ff;
+  --bg2:        #e2e5ff;
+  --surface:    #ffffff;
+  --surface2:   #f4f5ff;
+  --text:       #1b1a38;
+  --text2:      #5a587e;
+  --border:     #d0ccf8;
+  --primary:    #4f2fc8;
+  --primary2:   #7c5cfc;
+  --accent1:    #ff5060;
+  --accent2:    #ff9f0a;
+  --accent3:    #30d158;
+  --accent4:    #32ade6;
+  --correct:    #30d158;
+  --wrong:      #ff3b30;
+  --shadow:     0 6px 32px rgba(79,47,200,.14);
+  --shadow2:    0 2px 12px rgba(79,47,200,.09);
+  --radius:     18px;
+  --radius-sm:  11px;
+  --transition: 0.28s cubic-bezier(.4,0,.2,1);
+}
+[data-theme="dark"] {
+  --bg:      #0d0c22;
+  --bg2:     #131228;
+  --surface: #1a1836;
+  --surface2:#211f42;
+  --text:    #ededff;
+  --text2:   #9390bf;
+  --border:  #2b2855;
+  --primary: #7c5cfc;
+  --primary2:#a688ff;
+  --shadow:  0 6px 32px rgba(0,0,0,.5);
+  --shadow2: 0 2px 12px rgba(0,0,0,.35);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   BASE
+═══════════════════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  transition:background var(--transition),color var(--transition);
+  font-size:15px;
+  line-height:1.5;
+}
+button{font-family:inherit;cursor:pointer}
+select{font-family:inherit}
+.hidden{display:none!important}
+
+/* ═══════════════════════════════════════════════════════════
+   CABECERA
+═══════════════════════════════════════════════════════════ */
+header{
+  background:linear-gradient(135deg,#2d1b8e 0%,#4f2fc8 55%,#7c5cfc 100%);
+  color:#fff;
+  padding:0 20px;
+  height:58px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  position:sticky;top:0;z-index:300;
+  box-shadow:0 3px 20px rgba(45,27,142,.5);
+}
+.logo{
+  display:flex;align-items:center;gap:10px;
+  font-size:1.35rem;font-weight:900;letter-spacing:-.5px;
+  text-decoration:none;color:#fff;
+}
+.logo-icon{font-size:1.5rem}
+.logo-em{color:#ffd60a}
+.logo-tagline{font-size:.62rem;font-weight:600;opacity:.75;letter-spacing:1.8px;text-transform:uppercase;display:block;margin-top:-5px}
+.header-right{display:flex;align-items:center;gap:8px}
+.counter-pill{
+  background:rgba(255,255,255,.15);
+  padding:4px 13px;border-radius:20px;
+  font-size:.78rem;font-weight:700;
+}
+.icon-btn{
+  background:rgba(255,255,255,.18);border:none;color:#fff;
+  width:36px;height:36px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.05rem;transition:background .2s;
+}
+.icon-btn:hover{background:rgba(255,255,255,.32)}
+
+/* ═══════════════════════════════════════════════════════════
+   TABS
+═══════════════════════════════════════════════════════════ */
+.tabs-nav{
+  display:flex;background:var(--surface);
+  border-bottom:2px solid var(--border);
+  position:sticky;top:58px;z-index:200;
+  overflow:hidden;
+}
+.tab-btn{
+  flex:1;padding:13px 12px;border:none;background:none;
+  color:var(--text2);font-size:.85rem;font-weight:700;
+  border-bottom:3px solid transparent;margin-bottom:-2px;
+  transition:all .2s;white-space:nowrap;
+}
+.tab-btn.active{color:var(--primary);border-bottom-color:var(--primary);background:var(--surface2)}
+.tab-btn:hover:not(.active){color:var(--text);background:var(--bg2)}
+
+/* ═══════════════════════════════════════════════════════════
+   LAYOUT PRINCIPAL
+═══════════════════════════════════════════════════════════ */
+.main{max-width:940px;margin:0 auto;padding:22px 16px 60px}
+.screen{display:none}
+.screen.active{display:block}
+
+/* ═══════════════════════════════════════════════════════════
+   TARJETAS
+═══════════════════════════════════════════════════════════ */
+.card{
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:var(--radius);
+  padding:20px 22px;
+  box-shadow:var(--shadow2);
+  margin-bottom:16px;
+  transition:background var(--transition),border-color var(--transition);
+}
+.card-title{
+  font-size:.67rem;font-weight:800;
+  text-transform:uppercase;letter-spacing:2px;
+  color:var(--text2);margin-bottom:14px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SWITCH TOGGLE
+═══════════════════════════════════════════════════════════ */
+.sw-row{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.sw-label{font-size:.84rem;font-weight:600;color:var(--text2)}
+.sw{position:relative;display:inline-block;width:42px;height:24px;flex-shrink:0}
+.sw input{opacity:0;width:0;height:0}
+.sw-track{
+  position:absolute;inset:0;background:#bbb8de;border-radius:24px;
+  cursor:pointer;transition:.28s;
+}
+.sw-track::before{
+  content:'';position:absolute;
+  width:18px;height:18px;left:3px;top:3px;
+  background:#fff;border-radius:50%;
+  transition:.28s;box-shadow:0 1px 4px rgba(0,0,0,.25);
+}
+input:checked~.sw-track{background:var(--primary)}
+input:checked~.sw-track::before{transform:translateX(18px)}
+
+/* ═══════════════════════════════════════════════════════════
+   RADIO PILLS
+═══════════════════════════════════════════════════════════ */
+.radio-pills{display:flex;gap:6px;flex-wrap:wrap}
+.radio-pills input{display:none}
+.radio-pills label{
+  padding:5px 14px;border:2px solid var(--border);border-radius:20px;
+  cursor:pointer;font-size:.79rem;font-weight:700;color:var(--text2);
+  transition:all .18s;user-select:none;
+}
+.radio-pills input:checked+label{background:var(--primary);color:#fff;border-color:var(--primary)}
+.radio-pills label:hover{border-color:var(--primary);color:var(--primary)}
+
+/* ═══════════════════════════════════════════════════════════
+   FILTER CHIPS (toggle único)
+═══════════════════════════════════════════════════════════ */
+.fchips{display:flex;gap:6px;flex-wrap:wrap}
+.fchip{
+  padding:4px 12px;border:2px solid var(--border);border-radius:20px;
+  background:none;color:var(--text2);
+  font-size:.77rem;font-weight:700;transition:all .18s;
+}
+.fchip:hover,.fchip.on{border-color:var(--primary);color:var(--primary)}
+.fchip.on{background:var(--primary);color:#fff}
+
+/* ═══════════════════════════════════════════════════════════
+   CONFIG BAR
+═══════════════════════════════════════════════════════════ */
+.cfg-bar{display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start}
+.cfg-grp{display:flex;flex-direction:column;gap:7px}
+.cfg-lbl{font-size:.67rem;font-weight:800;text-transform:uppercase;letter-spacing:1.6px;color:var(--text2)}
+
+/* ═══════════════════════════════════════════════════════════
+   MÁQUINA TRAGAPERRAS
+═══════════════════════════════════════════════════════════ */
+.machine-shell{
+  background:linear-gradient(160deg,#2d1b8e 0%,#4f2fc8 48%,#7c3aed 100%);
+  border-radius:26px;padding:5px;
+  box-shadow:0 10px 48px rgba(79,47,200,.55),inset 0 1px 0 rgba(255,255,255,.18);
+  margin-bottom:18px;
+}
+.machine-body{
+  background:var(--surface);border-radius:22px;
+  padding:22px 18px 20px;
+}
+.machine-top{
+  text-align:center;margin-bottom:16px;
+  color:var(--text2);font-size:.72rem;font-weight:800;
+  text-transform:uppercase;letter-spacing:2.5px;
+}
+/* Luces decorativas */
+.machine-lights{
+  display:flex;justify-content:center;gap:8px;margin-bottom:14px;
+}
+.mlight{
+  width:9px;height:9px;border-radius:50%;
+  background:#bbb;transition:background .3s;
+}
+.mlight.on-r{background:var(--accent1);box-shadow:0 0 8px var(--accent1)}
+.mlight.on-g{background:var(--accent3);box-shadow:0 0 8px var(--accent3)}
+.mlight.on-b{background:var(--accent4);box-shadow:0 0 8px var(--accent4)}
+.mlight.on-y{background:var(--accent2);box-shadow:0 0 8px var(--accent2)}
+
+.reels-row{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;margin-bottom:20px;
+}
+@media(max-width:560px){.reels-row{grid-template-columns:repeat(2,1fr)}}
+
+.reel-col{display:flex;flex-direction:column;align-items:center;gap:7px}
+.reel-name{font-size:.64rem;font-weight:800;text-transform:uppercase;letter-spacing:1.6px;color:var(--text2)}
+
+/* Ventana de ruleta */
+.reel-window{
+  width:100%;height:90px;
+  border-radius:14px;overflow:hidden;position:relative;
+  border:2.5px solid var(--border);
+  background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  transition:border-color .2s,box-shadow .2s,transform .12s;
+  cursor:pointer;
+  user-select:none;
+}
+.reel-window:hover{
+  transform:translateY(-2px);
+  box-shadow:0 6px 22px rgba(79,47,200,.18);
+}
+.reel-window:active{ transform:scale(.97); }
+/* Pequeño icono de "girar" en la esquina al hacer hover */
+.reel-window::after{
+  content:'↻';
+  position:absolute;bottom:4px;right:6px;
+  font-size:.7rem;font-weight:900;opacity:0;
+  transition:opacity .18s;color:var(--text2);
+  z-index:5;pointer-events:none;
+}
+.reel-window:hover::after{ opacity:.55; }
+.rw-persona{border-color:var(--accent1)}
+.rw-modo   {border-color:var(--accent2)}
+.rw-tiempo {border-color:var(--accent3)}
+.rw-verbo  {border-color:var(--accent4)}
+
+/* Sombras internas top/bottom para efecto 3-D */
+.reel-window::before,.reel-window::after{
+  content:'';position:absolute;left:0;right:0;z-index:3;pointer-events:none;
+}
+.reel-window::before{top:0;height:28px;background:linear-gradient(to bottom,var(--bg) 10%,transparent)}
+.reel-window::after {bottom:0;height:28px;background:linear-gradient(to top,   var(--bg) 10%,transparent)}
+
+/* Cinta interior */
+.reel-tape{
+  position:absolute;width:100%;
+  display:flex;flex-direction:column;align-items:center;
+  /* La animación de desplazamiento se aplica vía JS (transform:translateY) */
+}
+.reel-item{
+  height:90px;width:100%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.88rem;font-weight:800;text-align:center;
+  padding:4px 8px;line-height:1.25;
+  flex-shrink:0;
+}
+.rw-persona .reel-item{color:var(--accent1)}
+.rw-modo    .reel-item{color:var(--accent2)}
+.rw-tiempo  .reel-item{color:var(--accent3)}
+.rw-verbo   .reel-item{color:var(--accent4)}
+
+/* Glow al girar */
+@keyframes glow-r{0%,100%{box-shadow:none}50%{box-shadow:0 0 20px 4px rgba(255,80,96,.5)}}
+@keyframes glow-y{0%,100%{box-shadow:none}50%{box-shadow:0 0 20px 4px rgba(255,159,10,.5)}}
+@keyframes glow-g{0%,100%{box-shadow:none}50%{box-shadow:0 0 20px 4px rgba(48,209,88,.5)}}
+@keyframes glow-b{0%,100%{box-shadow:none}50%{box-shadow:0 0 20px 4px rgba(50,173,230,.5)}}
+.rw-persona.spinning{animation:glow-r .4s ease-in-out infinite}
+.rw-modo.spinning   {animation:glow-y .4s ease-in-out infinite}
+.rw-tiempo.spinning {animation:glow-g .4s ease-in-out infinite}
+.rw-verbo.spinning  {animation:glow-b .4s ease-in-out infinite}
+
+/* Botones de la máquina */
+.machine-btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+
+/* ═══════════════════════════════════════════════════════════
+   BOTONES
+═══════════════════════════════════════════════════════════ */
+.btn{
+  padding:10px 24px;border:none;border-radius:50px;
+  font-size:.9rem;font-weight:800;
+  display:inline-flex;align-items:center;gap:7px;
+  transition:transform .15s,box-shadow .15s,opacity .15s,background .2s;
+  letter-spacing:.1px;white-space:nowrap;
+}
+.btn:active{transform:scale(.95)!important}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
+
+.btn-primary{
+  background:linear-gradient(135deg,#4f2fc8,#7c5cfc);
+  color:#fff;
+  box-shadow:0 4px 22px rgba(79,47,200,.45);
+  font-size:1rem;padding:13px 34px;
+}
+.btn-primary:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 7px 28px rgba(79,47,200,.55)}
+
+.btn-secondary{
+  background:var(--surface2);color:var(--text);
+  border:2px solid var(--border);
+}
+.btn-secondary:hover:not(:disabled){border-color:var(--primary);color:var(--primary)}
+
+.btn-audio{
+  background:#e0f2fe;color:#0369a1;border:2px solid #bae6fd;
+}
+[data-theme="dark"] .btn-audio{background:#082f49;color:#7dd3fc;border-color:#0c4a6e}
+.btn-audio:hover:not(:disabled){background:#bae6fd}
+
+.btn-ok{
+  background:linear-gradient(135deg,#059669,#10b981);color:#fff;
+  box-shadow:0 3px 14px rgba(5,150,105,.4);
+}
+.btn-sm{padding:7px 16px;font-size:.79rem}
+.btn-xs{padding:5px 12px;font-size:.74rem}
+
+/* ═══════════════════════════════════════════════════════════
+   TARJETA DE RESULTADO (Generador)
+═══════════════════════════════════════════════════════════ */
+@keyframes slideUp{
+  from{opacity:0;transform:translateY(20px)}
+  to  {opacity:1;transform:translateY(0)}
+}
+.result-card{
+  background:var(--surface);border:2px solid var(--border);
+  border-radius:var(--radius);padding:24px;
+  box-shadow:var(--shadow);
+  animation:slideUp .38s ease forwards;
+}
+.result-card.highlight{border-color:var(--primary);box-shadow:0 6px 36px rgba(79,47,200,.22)}
+
+.tipo-tag{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:3px 12px;border-radius:20px;
+  font-size:.68rem;font-weight:800;letter-spacing:.6px;
+  text-transform:uppercase;margin-bottom:10px;
+}
+.tag-reg{background:#dcfce7;color:#166534}
+.tag-irr{background:#fce7f3;color:#9d174d}
+[data-theme="dark"] .tag-reg{background:#052e16;color:#86efac}
+[data-theme="dark"] .tag-irr{background:#500724;color:#f9a8d4}
+
+.forma-display{
+  text-align:center;
+  font-size:clamp(2rem,6vw,3.3rem);
+  font-weight:900;
+  font-family:Georgia,'Times New Roman',serif;
+  background:linear-gradient(135deg,#4f2fc8,#7c5cfc,#db2777);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+  margin:8px 0 22px;
+  line-height:1.1;word-break:break-word;
+  letter-spacing:-.5px;
+}
+
+.details-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+  gap:9px;
+}
+.det-item{
+  background:var(--bg);border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:10px 13px;
+}
+.det-lbl{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:1.4px;color:var(--text2);margin-bottom:2px}
+.det-val{font-size:.9rem;font-weight:700;color:var(--text)}
+
+.res-footer{
+  display:flex;flex-wrap:wrap;gap:9px;align-items:center;
+  justify-content:space-between;
+  margin-top:18px;padding-top:16px;border-top:1.5px solid var(--border);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PANTALLA 2 – ANÁLISIS
+═══════════════════════════════════════════════════════════ */
+.diff-row{display:flex;gap:7px;flex-wrap:wrap}
+.diff-btn{
+  padding:6px 16px;border:2px solid var(--border);border-radius:20px;
+  background:none;color:var(--text2);
+  font-size:.8rem;font-weight:800;transition:all .18s;
+}
+.diff-btn:hover{border-color:var(--primary);color:var(--primary)}
+.diff-btn.on-f{background:#22c55e;color:#fff;border-color:#22c55e}
+.diff-btn.on-m{background:#f59e0b;color:#fff;border-color:#f59e0b}
+.diff-btn.on-a{background:#ef4444;color:#fff;border-color:#ef4444}
+
+.chk-row{display:flex;flex-wrap:wrap;gap:12px}
+.chk-item{display:flex;align-items:center;gap:5px;cursor:pointer}
+.chk-item input{accent-color:var(--primary);width:15px;height:15px;cursor:pointer}
+.chk-item span{font-size:.83rem;font-weight:600}
+
+/* Score */
+.score-bar{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:14px}
+.score-pill{display:flex;align-items:center;gap:6px;font-size:.82rem;font-weight:700}
+.sdot{width:9px;height:9px;border-radius:50%}
+.sdot-ok{background:var(--correct)}
+.sdot-err{background:var(--wrong)}
+
+/* Mode tabs análisis */
+.atabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.atab-btn{
+  padding:8px 18px;border:2px solid var(--border);border-radius:20px;
+  background:none;color:var(--text2);font-size:.82rem;font-weight:700;transition:all .18s;
+}
+.atab-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.atab-btn:hover:not(.active){border-color:var(--primary);color:var(--primary)}
+
+/* Forma verbal grande en análisis */
+.ana-forma-wrap{text-align:center;margin:6px 0 24px}
+.ana-forma{
+  font-size:clamp(2.2rem,7vw,3.6rem);
+  font-weight:900;
+  font-family:Georgia,'Times New Roman',serif;
+  background:linear-gradient(135deg,#4f2fc8,#9333ea,#f59e0b);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+  letter-spacing:-.5px;line-height:1.1;word-break:break-word;
+}
+
+/* Grid interactivo */
+.igrid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(175px,1fr));
+  gap:12px;margin-bottom:18px;
+}
+.ifield label{
+  display:block;font-size:.63rem;font-weight:800;
+  text-transform:uppercase;letter-spacing:1.4px;
+  color:var(--text2);margin-bottom:5px;
+}
+.iselect{
+  width:100%;padding:9px 32px 9px 12px;
+  border:2px solid var(--border);border-radius:var(--radius-sm);
+  background:var(--bg);color:var(--text);
+  font-size:.87rem;font-weight:600;
+  appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath fill='none' stroke='%23888' stroke-width='2' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 11px center;
+  transition:border-color .2s;font-family:inherit;
+}
+.iselect:focus{outline:none;border-color:var(--primary)}
+.iselect.sel-ok {border-color:var(--correct);background-color:#f0fdf4}
+.iselect.sel-err{border-color:var(--wrong);  background-color:#fff2f2}
+[data-theme="dark"] .iselect.sel-ok {background-color:#052e16}
+[data-theme="dark"] .iselect.sel-err{background-color:#450a0a}
+
+/* Feedback */
+.feedback{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:13px 16px;border-radius:13px;
+  margin-top:14px;font-weight:700;font-size:.88rem;
+  animation:slideUp .28s ease forwards;
+}
+.fb-ok {background:#dcfce7;color:#166534;border:2px solid #86efac}
+.fb-par{background:#fef3c7;color:#92400e;border:2px solid #fcd34d}
+.fb-err{background:#fee2e2;color:#991b1b;border:2px solid #fca5a5}
+[data-theme="dark"] .fb-ok {background:#052e16;color:#86efac;border-color:#166534}
+[data-theme="dark"] .fb-par{background:#451a03;color:#fcd34d;border-color:#92400e}
+[data-theme="dark"] .fb-err{background:#450a0a;color:#fca5a5;border-color:#991b1b}
+
+/* Revelado de análisis */
+.reveal-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(148px,1fr));
+  gap:9px;margin-top:14px;
+  animation:slideUp .32s ease forwards;
+}
+.rev-item{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:11px 13px}
+.rev-lbl{font-size:.61rem;font-weight:800;text-transform:uppercase;letter-spacing:1.3px;color:var(--text2);margin-bottom:2px}
+.rev-val{font-size:.94rem;font-weight:800;color:var(--text)}
+
+/* ═══════════════════════════════════════════════════════════
+   SECCIÓN DE AYUDA
+═══════════════════════════════════════════════════════════ */
+details.help-box{
+  background:var(--surface2);border:1.5px solid var(--border);
+  border-radius:14px;margin-top:16px;overflow:hidden;
+}
+details.help-box summary{
+  padding:13px 18px;cursor:pointer;
+  font-weight:700;font-size:.86rem;color:var(--primary);
+  list-style:none;display:flex;align-items:center;gap:7px;
+  user-select:none;
+}
+details.help-box summary::-webkit-details-marker{display:none}
+details.help-box[open] summary{border-bottom:1.5px solid var(--border)}
+.help-inner{
+  padding:14px 18px;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(195px,1fr));
+  gap:14px;
+}
+.help-item h4{font-size:.82rem;font-weight:800;color:var(--primary2);margin-bottom:4px}
+.help-item p {font-size:.8rem;color:var(--text2);line-height:1.6}
+
+/* Flex helpers */
+.flex-c{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap}
+.mt-14{margin-top:14px}
+.mb-4{margin-bottom:4px}
+.text-muted{color:var(--text2);font-size:.86rem}
+.divider{height:1.5px;background:var(--border);margin:14px 0}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     CABECERA
+═══════════════════════════════════════════════════════════ -->
+<header>
+  <a class="logo" href="#">
+    <span class="logo-icon">🎓</span>
+    <div>
+      Verb<span class="logo-em">Master</span>
+      <span class="logo-tagline">morfología verbal española</span>
+    </div>
+  </a>
+  <div class="header-right">
+    <div class="counter-pill" id="counterPill">Tiradas: 0</div>
+    <button class="icon-btn" id="themeBtn" title="Cambiar tema claro/oscuro">🌙</button>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════════════════════
+     NAVEGACIÓN POR PESTAÑAS
+═══════════════════════════════════════════════════════════ -->
+<nav class="tabs-nav">
+  <button class="tab-btn active" onclick="showTab('gen',this)">🎰 Generador de formas verbales</button>
+  <button class="tab-btn"        onclick="showTab('ana',this)">🔍 Análisis morfológico</button>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════════
+     CONTENEDOR PRINCIPAL
+═══════════════════════════════════════════════════════════ -->
+<div class="main">
+
+<!-- ────────────────────────────────────────────────────────
+     PANTALLA 1 – GENERADOR
+──────────────────────────────────────────────────────── -->
+<div id="screen-gen" class="screen active">
+
+  <!-- Configuración -->
+  <div class="card">
+    <div class="card-title">⚙️ Configuración</div>
+    <div class="cfg-bar">
+
+      <div class="cfg-grp">
+        <span class="cfg-lbl">Modo verbal</span>
+        <div class="radio-pills">
+          <input type="radio" name="rModo" id="rModoInd"  value="indicativo" checked>
+          <label for="rModoInd">Solo indicativo</label>
+          <input type="radio" name="rModo" id="rModoSubj" value="subjuntivo">
+          <label for="rModoSubj">Solo subjuntivo</label>
+          <input type="radio" name="rModo" id="rModoAmb"  value="ambos">
+          <label for="rModoAmb">Ambos modos</label>
+        </div>
+      </div>
+
+      <div class="cfg-grp">
+        <span class="cfg-lbl">Tipos de formas</span>
+        <div class="radio-pills">
+          <input type="radio" name="rFormas" id="rSimples"    value="simples"    checked>
+          <label for="rSimples">Solo simples</label>
+          <input type="radio" name="rFormas" id="rSoloComp"   value="solocomp">
+          <label for="rSoloComp">Solo compuestas</label>
+          <input type="radio" name="rFormas" id="rAmbas"      value="ambas">
+          <label for="rAmbas">Simples y compuestas</label>
+        </div>
+      </div>
+
+      <div class="cfg-grp">
+        <span class="cfg-lbl">Filtrar verbos</span>
+        <div class="fchips" id="fchipsGen">
+          <button class="fchip on"  data-f="todos"       onclick="setFiltro(this,'gen')">Todos</button>
+          <button class="fchip"     data-f="regulares"   onclick="setFiltro(this,'gen')">Regulares</button>
+          <button class="fchip"     data-f="irregulares" onclick="setFiltro(this,'gen')">Irregulares</button>
+          <button class="fchip"     data-f="ar"          onclick="setFiltro(this,'gen')">-ar</button>
+          <button class="fchip"     data-f="er"          onclick="setFiltro(this,'gen')">-er</button>
+          <button class="fchip"     data-f="ir"          onclick="setFiltro(this,'gen')">-ir</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MÁQUINA -->
+  <div class="machine-shell">
+    <div class="machine-body">
+      <div class="machine-top">✦ ruletas de morfología verbal ✦</div>
+      <div class="machine-lights">
+        <div class="mlight" id="ml0"></div>
+        <div class="mlight" id="ml1"></div>
+        <div class="mlight" id="ml2"></div>
+        <div class="mlight" id="ml3"></div>
+        <div class="mlight" id="ml4"></div>
+      </div>
+
+      <div class="reels-row">
+        <!-- Persona -->
+        <div class="reel-col">
+          <div class="reel-name">👤 Persona</div>
+          <div class="reel-window rw-persona" id="rwPersona" onclick="girarUna('persona')" title="Pulsa para girar solo esta ruleta">
+            <div class="reel-tape" id="rtPersona">
+              <div class="reel-item">—</div>
+            </div>
+          </div>
+        </div>
+        <!-- Modo -->
+        <div class="reel-col">
+          <div class="reel-name">📚 Modo</div>
+          <div class="reel-window rw-modo" id="rwModo" onclick="girarUna('modo')" title="Pulsa para girar solo esta ruleta">
+            <div class="reel-tape" id="rtModo">
+              <div class="reel-item">—</div>
+            </div>
+          </div>
+        </div>
+        <!-- Tiempo -->
+        <div class="reel-col">
+          <div class="reel-name">⏱️ Tiempo</div>
+          <div class="reel-window rw-tiempo" id="rwTiempo" onclick="girarUna('tiempo')" title="Pulsa para girar solo esta ruleta">
+            <div class="reel-tape" id="rtTiempo">
+              <div class="reel-item">—</div>
+            </div>
+          </div>
+        </div>
+        <!-- Verbo -->
+        <div class="reel-col">
+          <div class="reel-name">📝 Verbo</div>
+          <div class="reel-window rw-verbo" id="rwVerbo" onclick="girarUna('verbo')" title="Pulsa para girar solo esta ruleta">
+            <div class="reel-tape" id="rtVerbo">
+              <div class="reel-item">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="machine-btns">
+        <button class="btn btn-primary" id="btnGirar" onclick="girarRuletas()">🎰 Girar ruletas</button>
+        <button class="btn btn-secondary" onclick="reiniciarGen()">🔄 Reiniciar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Área de resultado -->
+  <div id="resArea" class="hidden"></div>
+
+  <!-- Ayuda -->
+  <details class="help-box">
+    <summary>❓ Conceptos clave de morfología verbal</summary>
+    <div class="help-inner">
+      <div class="help-item">
+        <h4>¿Qué es el modo verbal?</h4>
+        <p>El <strong>modo</strong> expresa la actitud del hablante. El <em>indicativo</em> presenta la acción como real. El <em>subjuntivo</em> la presenta como posible, deseada o dependiente.</p>
+      </div>
+      <div class="help-item">
+        <h4>¿Qué es el tiempo verbal?</h4>
+        <p>El <strong>tiempo</strong> sitúa la acción en el eje pasado–presente–futuro. El <em>presente</em> es ahora; el <em>pretérito imperfecto</em>, pasado habitual; el <em>pretérito perfecto simple</em>, pasado terminado; el <em>futuro</em>, lo venidero.</p>
+      </div>
+      <div class="help-item">
+        <h4>¿Qué es una forma compuesta?</h4>
+        <p>Las formas <strong>compuestas</strong> se construyen con el auxiliar <em>haber</em> conjugado más el participio del verbo: «he cantado», «habían comido», «hubiera venido». Las formas <strong>simples</strong> son una sola palabra.</p>
+      </div>
+      <div class="help-item">
+        <h4>Regulares e irregulares</h4>
+        <p>Los verbos <strong>regulares</strong> siguen siempre el patrón fijo de su conjugación. Los <strong>irregulares</strong> modifican la raíz o las terminaciones en algunas formas: <em>tener → tengo, tuve; ir → voy, fui</em>.</p>
+      </div>
+    </div>
+  </details>
+
+</div><!-- /screen-gen -->
+
+<!-- ────────────────────────────────────────────────────────
+     PANTALLA 2 – ANÁLISIS MORFOLÓGICO
+──────────────────────────────────────────────────────── -->
+<div id="screen-ana" class="screen">
+
+  <!-- Configuración análisis -->
+  <div class="card">
+    <div class="card-title">⚙️ Configuración del análisis</div>
+    <div class="cfg-bar">
+
+      <div class="cfg-grp">
+        <span class="cfg-lbl">Dificultad</span>
+        <div class="diff-row">
+          <button class="diff-btn on-f" data-d="facil" onclick="setDificultad(this)">🟢 Fácil</button>
+          <button class="diff-btn"      data-d="media" onclick="setDificultad(this)">🟡 Media</button>
+          <button class="diff-btn"      data-d="alta"  onclick="setDificultad(this)">🔴 Alta</button>
+        </div>
+      </div>
+
+      <div class="cfg-grp">
+        <span class="cfg-lbl">Aspectos a analizar</span>
+        <div class="chk-row">
+          <label class="chk-item"><input type="checkbox" id="chkInf" checked><span>Infinitivo</span></label>
+          <label class="chk-item"><input type="checkbox" id="chkPer" checked><span>Persona</span></label>
+          <label class="chk-item"><input type="checkbox" id="chkNum" checked><span>Número</span></label>
+          <label class="chk-item"><input type="checkbox" id="chkMod" checked><span>Modo</span></label>
+          <label class="chk-item"><input type="checkbox" id="chkTie" checked><span>Tiempo verbal</span></label>
+          <label class="chk-item"><input type="checkbox" id="chkTip" checked><span>Simple/compuesta</span></label>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Marcador -->
+  <div class="score-bar">
+    <div class="score-pill"><div class="sdot sdot-ok"></div>Correctas: <strong id="sOk">0</strong></div>
+    <div class="score-pill"><div class="sdot sdot-err"></div>Errores: <strong id="sErr">0</strong></div>
+    <button class="btn btn-secondary btn-sm" onclick="resetScore()">Resetear marcador</button>
+  </div>
+
+  <!-- Tarjeta principal de análisis -->
+  <div class="card" style="padding:24px">
+
+    <!-- Pestañas modo -->
+    <div class="atabs">
+      <button class="atab-btn active" id="atab-ref" onclick="setModoAna('ref',this)">🤔 Reflexión libre</button>
+      <button class="atab-btn"        id="atab-int" onclick="setModoAna('int',this)">🎯 Modo interactivo</button>
+    </div>
+
+    <!-- Forma verbal en grande -->
+    <div class="ana-forma-wrap">
+      <div class="card-title mb-4">Forma verbal</div>
+      <div class="ana-forma" id="anaForma">—</div>
+    </div>
+
+    <!-- PANEL REFLEXIÓN LIBRE -->
+    <div id="panelRef">
+      <p class="text-muted" style="text-align:center;margin-bottom:16px">
+        Analiza mentalmente la forma verbal y, cuando estés listo/a, revela el análisis completo.
+      </p>
+      <div class="flex-c">
+        <button class="btn btn-primary" onclick="nuevaFormaAna()">➡️ Nueva forma</button>
+        <button class="btn btn-secondary" onclick="revelarAnalisis()">👁️ Mostrar análisis</button>
+        <button class="btn btn-audio" onclick="escucharAna()">🔊 Escuchar</button>
+      </div>
+      <div id="revelado" class="hidden"></div>
+    </div>
+
+    <!-- PANEL INTERACTIVO -->
+    <div id="panelInt" class="hidden">
+      <div class="igrid" id="interactivoGrid"></div>
+      <div class="flex-c">
+        <button class="btn btn-ok" onclick="corregirInteractivo()">✅ Comprobar</button>
+        <button class="btn btn-primary" onclick="nuevaFormaAna()">➡️ Nueva forma</button>
+        <button class="btn btn-audio" onclick="escucharAna()">🔊 Escuchar</button>
+      </div>
+      <div id="feedbackInt" class="hidden"></div>
+      <div id="solucionInt" class="hidden"></div>
+    </div>
+
+  </div>
+
+  <!-- Ayuda análisis -->
+  <details class="help-box">
+    <summary>❓ ¿Cómo se analiza una forma verbal?</summary>
+    <div class="help-inner">
+      <div class="help-item">
+        <h4>Pasos para el análisis</h4>
+        <p>1) Localiza el <strong>infinitivo</strong>. 2) Comprueba si hay <em>haber</em> + participio → forma <strong>compuesta</strong>. 3) Observa la terminación para determinar <strong>persona, número, modo y tiempo</strong>.</p>
+      </div>
+      <div class="help-item">
+        <h4>Formas compuestas</h4>
+        <p>Siempre llevan <strong>haber</strong> conjugado + participio invariable: <em>he cantado, habíamos comido, hubiera venido, habrán salido…</em></p>
+      </div>
+      <div class="help-item">
+        <h4>Reconocer el subjuntivo</h4>
+        <p>El presente de subjuntivo de los verbos en -ar usa terminaciones en <em>-e</em> (cante). El imperfecto usa <em>-ara/-iera</em> (cantara, comiera). Suele ir con «que», «ojalá», «si»…</p>
+      </div>
+      <div class="help-item">
+        <h4>Persona y número</h4>
+        <p>Las terminaciones verbales indican la persona (1.ª, 2.ª, 3.ª) y número (singular/plural): <em>canto (1.ª sg.), cantáis (2.ª pl.), cantaron (3.ª pl.)</em></p>
+      </div>
+    </div>
+  </details>
+
+</div><!-- /screen-ana -->
+
+</div><!-- /main -->
+
+<!-- ═══════════════════════════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════════════════════════ -->
+<script>
+/* ============================================================
+   DATOS: PERSONAS
+============================================================ */
+const PERSONAS = [
+  { idx:0, pronombre:'yo',                   persona:'1.ª persona', numero:'singular' },
+  { idx:1, pronombre:'tú',                   persona:'2.ª persona', numero:'singular' },
+  { idx:2, pronombre:'él / ella',            persona:'3.ª persona', numero:'singular' },
+  { idx:3, pronombre:'nosotros / nosotras',  persona:'1.ª persona', numero:'plural'   },
+  { idx:4, pronombre:'vosotros / vosotras',  persona:'2.ª persona', numero:'plural'   },
+  { idx:5, pronombre:'ellos / ellas',        persona:'3.ª persona', numero:'plural'   }
+];
+
+/* ============================================================
+   DATOS: AUXILIAR HABER conjugado (para formas compuestas)
+   Orden: yo, tú, él/ella, nosotros, vosotros, ellos/ellas
+============================================================ */
+const HABER = {
+  /* Indicativo presente → pretérito perfecto compuesto (ind.) */
+  indPres:      ['he','has','ha','hemos','habéis','han'],
+  /* Indicativo imperfecto → pretérito pluscuamperfecto (ind.) */
+  indImp:       ['había','habías','había','habíamos','habíais','habían'],
+  /* Indicativo pretérito perfecto simple → pretérito anterior (ind.) */
+  indPS:        ['hube','hubiste','hubo','hubimos','hubisteis','hubieron'],
+  /* Indicativo futuro simple → futuro compuesto (ind.) */
+  indFut:       ['habré','habrás','habrá','habremos','habréis','habrán'],
+  /* Indicativo condicional simple → condicional compuesto (ind.) */
+  indCond:      ['habría','habrías','habría','habríamos','habríais','habrían'],
+  /* Subjuntivo presente → pretérito perfecto compuesto (subj.) */
+  subjPres:     ['haya','hayas','haya','hayamos','hayáis','hayan'],
+  /* Subjuntivo imperfecto -ra → pretérito pluscuamperfecto -ra (subj.) */
+  subjImp:      ['hubiera','hubieras','hubiera','hubiéramos','hubierais','hubieran'],
+  /* Subjuntivo imperfecto -se → pretérito pluscuamperfecto -se (subj.) */
+  subjImpEse:   ['hubiese','hubieses','hubiese','hubiésemos','hubieseis','hubiesen']
+};
+
+/* ============================================================
+   DATOS: DEFINICIÓN DE TIEMPOS POR MODO
+   haberKey: null → forma simple (usar verbo.formas[tiempoId][personaIdx])
+   haberKey: 'xxx' → forma compuesta (HABER[xxx][personaIdx] + participio)
+============================================================ */
+const TIEMPOS = {
+  indicativo: {
+    simples: [
+      { id:'indPres',  label:'presente',                  haberKey:null  },
+      { id:'indImp',   label:'pretérito imperfecto',      haberKey:null  },
+      { id:'indPS',    label:'pretérito perfecto simple', haberKey:null  },
+      { id:'indFut',   label:'futuro simple',             haberKey:null  },
+      { id:'indCond',  label:'condicional simple',        haberKey:null  }
+    ],
+    compuestos: [
+      { id:'indPerfComp',  label:'pretérito perfecto compuesto', haberKey:'indPres'  },
+      { id:'indPluscuamp', label:'pretérito pluscuamperfecto',   haberKey:'indImp'   },
+      { id:'indPretAnt',   label:'pretérito anterior',           haberKey:'indPS'    },
+      { id:'indFutComp',   label:'futuro compuesto',             haberKey:'indFut'   },
+      { id:'indCondComp',  label:'condicional compuesto',        haberKey:'indCond'  }
+    ]
+  },
+  subjuntivo: {
+    simples: [
+      { id:'subjPres',   label:'presente de subjuntivo',              haberKey:null       },
+      { id:'subjImp',    label:'pretérito imperfecto de subj. (-ra)', haberKey:null       },
+      { id:'subjImpEse', label:'pretérito imperfecto de subj. (-se)', haberKey:null       }
+    ],
+    compuestos: [
+      { id:'subjPerfComp',      label:'pretérito perfecto compuesto de subj.',        haberKey:'subjPres'   },
+      { id:'subjPluscuamp',     label:'pretérito pluscuamperfecto de subj. (-ra)',    haberKey:'subjImp'    },
+      { id:'subjPluscuampEse',  label:'pretérito pluscuamperfecto de subj. (-se)',    haberKey:'subjImpEse' }
+    ]
+  }
+};
+
+/* ============================================================
+   BASE DE DATOS DE VERBOS
+   Cada verbo incluye TODAS sus formas simples ya conjugadas,
+   más el participio para construir formas compuestas.
+   tipo: 'regular' | 'irregular'
+   conjugacion: 'ar' | 'er' | 'ir'
+   participio: string
+   formas: {
+     indPres:  [yo, tú, él, nosotros, vosotros, ellos],
+     indImp:   [...],
+     indPS:    [...],
+     indFut:   [...],
+     indCond:  [...],
+     subjPres: [...],
+     subjImp:  [...]
+   }
+============================================================ */
+const VERBOS = {
+
+  /* ── REGULARES -AR ─────────────────────────────── */
+
+  cantar: {
+    tipo:'regular', conjugacion:'ar', participio:'cantado',
+    formas:{
+      indPres:  ['canto','cantas','canta','cantamos','cantáis','cantan'],
+      indImp:   ['cantaba','cantabas','cantaba','cantábamos','cantabais','cantaban'],
+      indPS:    ['canté','cantaste','cantó','cantamos','cantasteis','cantaron'],
+      indFut:   ['cantaré','cantarás','cantará','cantaremos','cantaréis','cantarán'],
+      indCond:  ['cantaría','cantarías','cantaría','cantaríamos','cantaríais','cantarían'],
+      subjPres: ['cante','cantes','cante','cantemos','cantéis','canten'],
+      subjImp:  ['cantara','cantaras','cantara','cantáramos','cantarais','cantaran']
+    }
+  },
+  bailar: {
+    tipo:'regular', conjugacion:'ar', participio:'bailado',
+    formas:{
+      indPres:  ['bailo','bailas','baila','bailamos','bailáis','bailan'],
+      indImp:   ['bailaba','bailabas','bailaba','bailábamos','bailabais','bailaban'],
+      indPS:    ['bailé','bailaste','bailó','bailamos','bailasteis','bailaron'],
+      indFut:   ['bailaré','bailarás','bailará','bailaremos','bailaréis','bailarán'],
+      indCond:  ['bailaría','bailarías','bailaría','bailaríamos','bailaríais','bailarían'],
+      subjPres: ['baile','bailes','baile','bailemos','bailéis','bailen'],
+      subjImp:  ['bailara','bailaras','bailara','bailáramos','bailarais','bailaran']
+    }
+  },
+  saltar: {
+    tipo:'regular', conjugacion:'ar', participio:'saltado',
+    formas:{
+      indPres:  ['salto','saltas','salta','saltamos','saltáis','saltan'],
+      indImp:   ['saltaba','saltabas','saltaba','saltábamos','saltabais','saltaban'],
+      indPS:    ['salté','saltaste','saltó','saltamos','saltasteis','saltaron'],
+      indFut:   ['saltaré','saltarás','saltará','saltaremos','saltaréis','saltarán'],
+      indCond:  ['saltaría','saltarías','saltaría','saltaríamos','saltaríais','saltarían'],
+      subjPres: ['salte','saltes','salte','saltemos','saltéis','salten'],
+      subjImp:  ['saltara','saltaras','saltara','saltáramos','saltarais','saltaran']
+    }
+  },
+  estudiar: {
+    tipo:'regular', conjugacion:'ar', participio:'estudiado',
+    formas:{
+      indPres:  ['estudio','estudias','estudia','estudiamos','estudiáis','estudian'],
+      indImp:   ['estudiaba','estudiabas','estudiaba','estudiábamos','estudiabais','estudiaban'],
+      indPS:    ['estudié','estudiaste','estudió','estudiamos','estudiasteis','estudiaron'],
+      indFut:   ['estudiaré','estudiarás','estudiará','estudiaremos','estudiaréis','estudiarán'],
+      indCond:  ['estudiaría','estudiarías','estudiaría','estudiaríamos','estudiaríais','estudiarían'],
+      subjPres: ['estudie','estudies','estudie','estudiemos','estudiéis','estudien'],
+      subjImp:  ['estudiara','estudiaras','estudiara','estudiáramos','estudiarais','estudiaran']
+    }
+  },
+  trabajar: {
+    tipo:'regular', conjugacion:'ar', participio:'trabajado',
+    formas:{
+      indPres:  ['trabajo','trabajas','trabaja','trabajamos','trabajáis','trabajan'],
+      indImp:   ['trabajaba','trabajabas','trabajaba','trabajábamos','trabajabais','trabajaban'],
+      indPS:    ['trabajé','trabajaste','trabajó','trabajamos','trabajasteis','trabajaron'],
+      indFut:   ['trabajaré','trabajarás','trabajará','trabajaremos','trabajaréis','trabajarán'],
+      indCond:  ['trabajaría','trabajarías','trabajaría','trabajaríamos','trabajaríais','trabajarían'],
+      subjPres: ['trabaje','trabajes','trabaje','trabajemos','trabajéis','trabajen'],
+      subjImp:  ['trabajara','trabajaras','trabajara','trabajáramos','trabajarais','trabajaran']
+    }
+  },
+  hablar: {
+    tipo:'regular', conjugacion:'ar', participio:'hablado',
+    formas:{
+      indPres:  ['hablo','hablas','habla','hablamos','habláis','hablan'],
+      indImp:   ['hablaba','hablabas','hablaba','hablábamos','hablabais','hablaban'],
+      indPS:    ['hablé','hablaste','habló','hablamos','hablasteis','hablaron'],
+      indFut:   ['hablaré','hablarás','hablará','hablaremos','hablaréis','hablarán'],
+      indCond:  ['hablaría','hablarías','hablaría','hablaríamos','hablaríais','hablarían'],
+      subjPres: ['hable','hables','hable','hablemos','habléis','hablen'],
+      subjImp:  ['hablara','hablaras','hablara','habláramos','hablarais','hablaran']
+    }
+  },
+  amar: {
+    tipo:'regular', conjugacion:'ar', participio:'amado',
+    formas:{
+      indPres:  ['amo','amas','ama','amamos','amáis','aman'],
+      indImp:   ['amaba','amabas','amaba','amábamos','amabais','amaban'],
+      indPS:    ['amé','amaste','amó','amamos','amasteis','amaron'],
+      indFut:   ['amaré','amarás','amará','amaremos','amaréis','amarán'],
+      indCond:  ['amaría','amarías','amaría','amaríamos','amaríais','amarían'],
+      subjPres: ['ame','ames','ame','amemos','améis','amen'],
+      subjImp:  ['amara','amaras','amara','amáramos','amarais','amaran']
+    }
+  },
+  llamar: {
+    tipo:'regular', conjugacion:'ar', participio:'llamado',
+    formas:{
+      indPres:  ['llamo','llamas','llama','llamamos','llamáis','llaman'],
+      indImp:   ['llamaba','llamabas','llamaba','llamábamos','llamabais','llamaban'],
+      indPS:    ['llamé','llamaste','llamó','llamamos','llamasteis','llamaron'],
+      indFut:   ['llamaré','llamarás','llamará','llamaremos','llamaréis','llamarán'],
+      indCond:  ['llamaría','llamarías','llamaría','llamaríamos','llamaríais','llamarían'],
+      subjPres: ['llame','llames','llame','llamemos','llaméis','llamen'],
+      subjImp:  ['llamara','llamaras','llamara','llamáramos','llamarais','llamaran']
+    }
+  },
+  mirar: {
+    tipo:'regular', conjugacion:'ar', participio:'mirado',
+    formas:{
+      indPres:  ['miro','miras','mira','miramos','miráis','miran'],
+      indImp:   ['miraba','mirabas','miraba','mirábamos','mirabais','miraban'],
+      indPS:    ['miré','miraste','miró','miramos','mirasteis','miraron'],
+      indFut:   ['miraré','mirarás','mirará','miraremos','miraréis','mirarán'],
+      indCond:  ['miraría','mirarías','miraría','miraríamos','miraríais','mirarían'],
+      subjPres: ['mire','mires','mire','miremos','miréis','miren'],
+      subjImp:  ['mirara','miraras','mirara','miráramos','mirarais','miraran']
+    }
+  },
+
+  /* ── REGULARES -ER ─────────────────────────────── */
+
+  temer: {
+    tipo:'regular', conjugacion:'er', participio:'temido',
+    formas:{
+      indPres:  ['temo','temes','teme','tememos','teméis','temen'],
+      indImp:   ['temía','temías','temía','temíamos','temíais','temían'],
+      indPS:    ['temí','temiste','temió','temimos','temisteis','temieron'],
+      indFut:   ['temeré','temerás','temerá','temeremos','temeréis','temerán'],
+      indCond:  ['temería','temerías','temería','temeríamos','temeríais','temerían'],
+      subjPres: ['tema','temas','tema','temamos','temáis','teman'],
+      subjImp:  ['temiera','temieras','temiera','temiéramos','temierais','temieran']
+    }
+  },
+  beber: {
+    tipo:'regular', conjugacion:'er', participio:'bebido',
+    formas:{
+      indPres:  ['bebo','bebes','bebe','bebemos','bebéis','beben'],
+      indImp:   ['bebía','bebías','bebía','bebíamos','bebíais','bebían'],
+      indPS:    ['bebí','bebiste','bebió','bebimos','bebisteis','bebieron'],
+      indFut:   ['beberé','beberás','beberá','beberemos','beberéis','beberán'],
+      indCond:  ['bebería','beberías','bebería','beberíamos','beberíais','beberían'],
+      subjPres: ['beba','bebas','beba','bebamos','bebáis','beban'],
+      subjImp:  ['bebiera','bebieras','bebiera','bebiéramos','bebierais','bebieran']
+    }
+  },
+  aprender: {
+    tipo:'regular', conjugacion:'er', participio:'aprendido',
+    formas:{
+      indPres:  ['aprendo','aprendes','aprende','aprendemos','aprendéis','aprenden'],
+      indImp:   ['aprendía','aprendías','aprendía','aprendíamos','aprendíais','aprendían'],
+      indPS:    ['aprendí','aprendiste','aprendió','aprendimos','aprendisteis','aprendieron'],
+      indFut:   ['aprenderé','aprenderás','aprenderá','aprenderemos','aprenderéis','aprenderán'],
+      indCond:  ['aprendería','aprenderías','aprendería','aprenderíamos','aprenderíais','aprenderían'],
+      subjPres: ['aprenda','aprendas','aprenda','aprendamos','aprendáis','aprendan'],
+      subjImp:  ['aprendiera','aprendieras','aprendiera','aprendiéramos','aprendierais','aprendieran']
+    }
+  },
+  comer: {
+    tipo:'regular', conjugacion:'er', participio:'comido',
+    formas:{
+      indPres:  ['como','comes','come','comemos','coméis','comen'],
+      indImp:   ['comía','comías','comía','comíamos','comíais','comían'],
+      indPS:    ['comí','comiste','comió','comimos','comisteis','comieron'],
+      indFut:   ['comeré','comerás','comerá','comeremos','comeréis','comerán'],
+      indCond:  ['comería','comerías','comería','comeríamos','comeríais','comerían'],
+      subjPres: ['coma','comas','coma','comamos','comáis','coman'],
+      subjImp:  ['comiera','comieras','comiera','comiéramos','comierais','comieran']
+    }
+  },
+  vender: {
+    tipo:'regular', conjugacion:'er', participio:'vendido',
+    formas:{
+      indPres:  ['vendo','vendes','vende','vendemos','vendéis','venden'],
+      indImp:   ['vendía','vendías','vendía','vendíamos','vendíais','vendían'],
+      indPS:    ['vendí','vendiste','vendió','vendimos','vendisteis','vendieron'],
+      indFut:   ['venderé','venderás','venderá','venderemos','venderéis','venderán'],
+      indCond:  ['vendería','venderías','vendería','venderíamos','venderíais','venderían'],
+      subjPres: ['venda','vendas','venda','vendamos','vendáis','vendan'],
+      subjImp:  ['vendiera','vendieras','vendiera','vendiéramos','vendierais','vendieran']
+    }
+  },
+  correr: {
+    tipo:'regular', conjugacion:'er', participio:'corrido',
+    formas:{
+      indPres:  ['corro','corres','corre','corremos','corréis','corren'],
+      indImp:   ['corría','corrías','corría','corríamos','corríais','corrían'],
+      indPS:    ['corrí','corriste','corrió','corrimos','corristeis','corrieron'],
+      indFut:   ['correré','correrás','correrá','correremos','correréis','correrán'],
+      indCond:  ['correría','correrías','correría','correríamos','correríais','correrían'],
+      subjPres: ['corra','corras','corra','corramos','corráis','corran'],
+      subjImp:  ['corriera','corrieras','corriera','corriéramos','corrierais','corrieran']
+    }
+  },
+
+  /* ── REGULARES -IR ─────────────────────────────── */
+
+  vivir: {
+    tipo:'regular', conjugacion:'ir', participio:'vivido',
+    formas:{
+      indPres:  ['vivo','vives','vive','vivimos','vivís','viven'],
+      indImp:   ['vivía','vivías','vivía','vivíamos','vivíais','vivían'],
+      indPS:    ['viví','viviste','vivió','vivimos','vivisteis','vivieron'],
+      indFut:   ['viviré','vivirás','vivirá','viviremos','viviréis','vivirán'],
+      indCond:  ['viviría','vivirías','viviría','viviríamos','viviríais','vivirían'],
+      subjPres: ['viva','vivas','viva','vivamos','viváis','vivan'],
+      subjImp:  ['viviera','vivieras','viviera','viviéramos','vivierais','vivieran']
+    }
+  },
+  partir: {
+    tipo:'regular', conjugacion:'ir', participio:'partido',
+    formas:{
+      indPres:  ['parto','partes','parte','partimos','partís','parten'],
+      indImp:   ['partía','partías','partía','partíamos','partíais','partían'],
+      indPS:    ['partí','partiste','partió','partimos','partisteis','partieron'],
+      indFut:   ['partiré','partirás','partirá','partiremos','partiréis','partirán'],
+      indCond:  ['partiría','partirías','partiría','partiríamos','partiríais','partirían'],
+      subjPres: ['parta','partas','parta','partamos','partáis','partan'],
+      subjImp:  ['partiera','partieras','partiera','partiéramos','partierais','partieran']
+    }
+  },
+  abrir: {
+    /* formas simples regulares; participio irregular: abierto */
+    tipo:'regular', conjugacion:'ir', participio:'abierto',
+    formas:{
+      indPres:  ['abro','abres','abre','abrimos','abrís','abren'],
+      indImp:   ['abría','abrías','abría','abríamos','abríais','abrían'],
+      indPS:    ['abrí','abriste','abrió','abrimos','abristeis','abrieron'],
+      indFut:   ['abriré','abrirás','abrirá','abriremos','abriréis','abrirán'],
+      indCond:  ['abriría','abrirías','abriría','abriríamos','abriríais','abrirían'],
+      subjPres: ['abra','abras','abra','abramos','abráis','abran'],
+      subjImp:  ['abriera','abrieras','abriera','abriéramos','abrierais','abrieran']
+    }
+  },
+  escribir: {
+    /* formas simples regulares; participio irregular: escrito */
+    tipo:'regular', conjugacion:'ir', participio:'escrito',
+    formas:{
+      indPres:  ['escribo','escribes','escribe','escribimos','escribís','escriben'],
+      indImp:   ['escribía','escribías','escribía','escribíamos','escribíais','escribían'],
+      indPS:    ['escribí','escribiste','escribió','escribimos','escribisteis','escribieron'],
+      indFut:   ['escribiré','escribirás','escribirá','escribiremos','escribiréis','escribirán'],
+      indCond:  ['escribiría','escribirías','escribiría','escribiríamos','escribiríais','escribirían'],
+      subjPres: ['escriba','escribas','escriba','escribamos','escribáis','escriban'],
+      subjImp:  ['escribiera','escribieras','escribiera','escribiéramos','escribierais','escribieran']
+    }
+  },
+  subir: {
+    tipo:'regular', conjugacion:'ir', participio:'subido',
+    formas:{
+      indPres:  ['subo','subes','sube','subimos','subís','suben'],
+      indImp:   ['subía','subías','subía','subíamos','subíais','subían'],
+      indPS:    ['subí','subiste','subió','subimos','subisteis','subieron'],
+      indFut:   ['subiré','subirás','subirá','subiremos','subiréis','subirán'],
+      indCond:  ['subiría','subirías','subiría','subiríamos','subiríais','subirían'],
+      subjPres: ['suba','subas','suba','subamos','subáis','suban'],
+      subjImp:  ['subiera','subieras','subiera','subiéramos','subierais','subieran']
+    }
+  },
+
+  /* ── IRREGULARES ───────────────────────────────── */
+
+  ser: {
+    tipo:'irregular', conjugacion:'er', participio:'sido',
+    formas:{
+      indPres:  ['soy','eres','es','somos','sois','son'],
+      indImp:   ['era','eras','era','éramos','erais','eran'],
+      indPS:    ['fui','fuiste','fue','fuimos','fuisteis','fueron'],
+      indFut:   ['seré','serás','será','seremos','seréis','serán'],
+      indCond:  ['sería','serías','sería','seríamos','seríais','serían'],
+      subjPres: ['sea','seas','sea','seamos','seáis','sean'],
+      subjImp:  ['fuera','fueras','fuera','fuéramos','fuerais','fueran']
+    }
+  },
+  estar: {
+    tipo:'irregular', conjugacion:'ar', participio:'estado',
+    formas:{
+      indPres:  ['estoy','estás','está','estamos','estáis','están'],
+      indImp:   ['estaba','estabas','estaba','estábamos','estabais','estaban'],
+      indPS:    ['estuve','estuviste','estuvo','estuvimos','estuvisteis','estuvieron'],
+      indFut:   ['estaré','estarás','estará','estaremos','estaréis','estarán'],
+      indCond:  ['estaría','estarías','estaría','estaríamos','estaríais','estarían'],
+      subjPres: ['esté','estés','esté','estemos','estéis','estén'],
+      subjImp:  ['estuviera','estuvieras','estuviera','estuviéramos','estuvierais','estuvieran']
+    }
+  },
+  ir: {
+    tipo:'irregular', conjugacion:'ir', participio:'ido',
+    formas:{
+      indPres:  ['voy','vas','va','vamos','vais','van'],
+      indImp:   ['iba','ibas','iba','íbamos','ibais','iban'],
+      indPS:    ['fui','fuiste','fue','fuimos','fuisteis','fueron'],
+      indFut:   ['iré','irás','irá','iremos','iréis','irán'],
+      indCond:  ['iría','irías','iría','iríamos','iríais','irían'],
+      subjPres: ['vaya','vayas','vaya','vayamos','vayáis','vayan'],
+      subjImp:  ['fuera','fueras','fuera','fuéramos','fuerais','fueran']
+    }
+  },
+  haber: {
+    tipo:'irregular', conjugacion:'er', participio:'habido',
+    formas:{
+      indPres:  ['he','has','ha','hemos','habéis','han'],
+      indImp:   ['había','habías','había','habíamos','habíais','habían'],
+      indPS:    ['hube','hubiste','hubo','hubimos','hubisteis','hubieron'],
+      indFut:   ['habré','habrás','habrá','habremos','habréis','habrán'],
+      indCond:  ['habría','habrías','habría','habríamos','habríais','habrían'],
+      subjPres: ['haya','hayas','haya','hayamos','hayáis','hayan'],
+      subjImp:  ['hubiera','hubieras','hubiera','hubiéramos','hubierais','hubieran']
+    }
+  },
+  tener: {
+    tipo:'irregular', conjugacion:'er', participio:'tenido',
+    formas:{
+      indPres:  ['tengo','tienes','tiene','tenemos','tenéis','tienen'],
+      indImp:   ['tenía','tenías','tenía','teníamos','teníais','tenían'],
+      indPS:    ['tuve','tuviste','tuvo','tuvimos','tuvisteis','tuvieron'],
+      indFut:   ['tendré','tendrás','tendrá','tendremos','tendréis','tendrán'],
+      indCond:  ['tendría','tendrías','tendría','tendríamos','tendríais','tendrían'],
+      subjPres: ['tenga','tengas','tenga','tengamos','tengáis','tengan'],
+      subjImp:  ['tuviera','tuvieras','tuviera','tuviéramos','tuvierais','tuvieran']
+    }
+  },
+  venir: {
+    tipo:'irregular', conjugacion:'ir', participio:'venido',
+    formas:{
+      indPres:  ['vengo','vienes','viene','venimos','venís','vienen'],
+      indImp:   ['venía','venías','venía','veníamos','veníais','venían'],
+      indPS:    ['vine','viniste','vino','vinimos','vinisteis','vinieron'],
+      indFut:   ['vendré','vendrás','vendrá','vendremos','vendréis','vendrán'],
+      indCond:  ['vendría','vendrías','vendría','vendríamos','vendríais','vendrían'],
+      subjPres: ['venga','vengas','venga','vengamos','vengáis','vengan'],
+      subjImp:  ['viniera','vinieras','viniera','viniéramos','vinierais','vinieran']
+    }
+  },
+  decir: {
+    tipo:'irregular', conjugacion:'ir', participio:'dicho',
+    formas:{
+      indPres:  ['digo','dices','dice','decimos','decís','dicen'],
+      indImp:   ['decía','decías','decía','decíamos','decíais','decían'],
+      indPS:    ['dije','dijiste','dijo','dijimos','dijisteis','dijeron'],
+      indFut:   ['diré','dirás','dirá','diremos','diréis','dirán'],
+      indCond:  ['diría','dirías','diría','diríamos','diríais','dirían'],
+      subjPres: ['diga','digas','diga','digamos','digáis','digan'],
+      subjImp:  ['dijera','dijeras','dijera','dijéramos','dijerais','dijeran']
+    }
+  },
+  poder: {
+    tipo:'irregular', conjugacion:'er', participio:'podido',
+    formas:{
+      indPres:  ['puedo','puedes','puede','podemos','podéis','pueden'],
+      indImp:   ['podía','podías','podía','podíamos','podíais','podían'],
+      indPS:    ['pude','pudiste','pudo','pudimos','pudisteis','pudieron'],
+      indFut:   ['podré','podrás','podrá','podremos','podréis','podrán'],
+      indCond:  ['podría','podrías','podría','podríamos','podríais','podrían'],
+      subjPres: ['pueda','puedas','pueda','podamos','podáis','puedan'],
+      subjImp:  ['pudiera','pudieras','pudiera','pudiéramos','pudierais','pudieran']
+    }
+  },
+  poner: {
+    tipo:'irregular', conjugacion:'er', participio:'puesto',
+    formas:{
+      indPres:  ['pongo','pones','pone','ponemos','ponéis','ponen'],
+      indImp:   ['ponía','ponías','ponía','poníamos','poníais','ponían'],
+      indPS:    ['puse','pusiste','puso','pusimos','pusisteis','pusieron'],
+      indFut:   ['pondré','pondrás','pondrá','pondremos','pondréis','pondrán'],
+      indCond:  ['pondría','pondrías','pondría','pondríamos','pondríais','pondrían'],
+      subjPres: ['ponga','pongas','ponga','pongamos','pongáis','pongan'],
+      subjImp:  ['pusiera','pusieras','pusiera','pusiéramos','pusierais','pusieran']
+    }
+  },
+  hacer: {
+    tipo:'irregular', conjugacion:'er', participio:'hecho',
+    formas:{
+      indPres:  ['hago','haces','hace','hacemos','hacéis','hacen'],
+      indImp:   ['hacía','hacías','hacía','hacíamos','hacíais','hacían'],
+      indPS:    ['hice','hiciste','hizo','hicimos','hicisteis','hicieron'],
+      indFut:   ['haré','harás','hará','haremos','haréis','harán'],
+      indCond:  ['haría','harías','haría','haríamos','haríais','harían'],
+      subjPres: ['haga','hagas','haga','hagamos','hagáis','hagan'],
+      subjImp:  ['hiciera','hicieras','hiciera','hiciéramos','hicierais','hicieran']
+    }
+  },
+  ver: {
+    tipo:'irregular', conjugacion:'er', participio:'visto',
+    formas:{
+      indPres:  ['veo','ves','ve','vemos','veis','ven'],
+      indImp:   ['veía','veías','veía','veíamos','veíais','veían'],
+      indPS:    ['vi','viste','vio','vimos','visteis','vieron'],
+      indFut:   ['veré','verás','verá','veremos','veréis','verán'],
+      indCond:  ['vería','verías','vería','veríamos','veríais','verían'],
+      subjPres: ['vea','veas','vea','veamos','veáis','vean'],
+      subjImp:  ['viera','vieras','viera','viéramos','vierais','vieran']
+    }
+  },
+  dar: {
+    tipo:'irregular', conjugacion:'ar', participio:'dado',
+    formas:{
+      indPres:  ['doy','das','da','damos','dais','dan'],
+      indImp:   ['daba','dabas','daba','dábamos','dabais','daban'],
+      indPS:    ['di','diste','dio','dimos','disteis','dieron'],
+      indFut:   ['daré','darás','dará','daremos','daréis','darán'],
+      indCond:  ['daría','darías','daría','daríamos','daríais','darían'],
+      subjPres: ['dé','des','dé','demos','deis','den'],
+      subjImp:  ['diera','dieras','diera','diéramos','dierais','dieran']
+    }
+  },
+  saber: {
+    tipo:'irregular', conjugacion:'er', participio:'sabido',
+    formas:{
+      indPres:  ['sé','sabes','sabe','sabemos','sabéis','saben'],
+      indImp:   ['sabía','sabías','sabía','sabíamos','sabíais','sabían'],
+      indPS:    ['supe','supiste','supo','supimos','supisteis','supieron'],
+      indFut:   ['sabré','sabrás','sabrá','sabremos','sabréis','sabrán'],
+      indCond:  ['sabría','sabrías','sabría','sabríamos','sabríais','sabrían'],
+      subjPres: ['sepa','sepas','sepa','sepamos','sepáis','sepan'],
+      subjImp:  ['supiera','supieras','supiera','supiéramos','supierais','supieran']
+    }
+  },
+  querer: {
+    tipo:'irregular', conjugacion:'er', participio:'querido',
+    formas:{
+      indPres:  ['quiero','quieres','quiere','queremos','queréis','quieren'],
+      indImp:   ['quería','querías','quería','queríamos','queríais','querían'],
+      indPS:    ['quise','quisiste','quiso','quisimos','quisisteis','quisieron'],
+      indFut:   ['querré','querrás','querrá','querremos','querréis','querrán'],
+      indCond:  ['querría','querrías','querría','querríamos','querríais','querrían'],
+      subjPres: ['quiera','quieras','quiera','queramos','queráis','quieran'],
+      subjImp:  ['quisiera','quisieras','quisiera','quisiéramos','quisierais','quisieran']
+    }
+  },
+  traer: {
+    tipo:'irregular', conjugacion:'er', participio:'traído',
+    formas:{
+      indPres:  ['traigo','traes','trae','traemos','traéis','traen'],
+      indImp:   ['traía','traías','traía','traíamos','traíais','traían'],
+      indPS:    ['traje','trajiste','trajo','trajimos','trajisteis','trajeron'],
+      indFut:   ['traeré','traerás','traerá','traeremos','traeréis','traerán'],
+      indCond:  ['traería','traerías','traería','traeríamos','traeríais','traerían'],
+      subjPres: ['traiga','traigas','traiga','traigamos','traigáis','traigan'],
+      subjImp:  ['trajera','trajeras','trajera','trajéramos','trajerais','trajeran']
+    }
+  },
+  conducir: {
+    tipo:'irregular', conjugacion:'ir', participio:'conducido',
+    formas:{
+      indPres:  ['conduzco','conduces','conduce','conducimos','conducís','conducen'],
+      indImp:   ['conducía','conducías','conducía','conducíamos','conducíais','conducían'],
+      indPS:    ['conduje','condujiste','condujo','condujimos','condujisteis','condujeron'],
+      indFut:   ['conduciré','conducirás','conducirá','conduciremos','conduciréis','conducirán'],
+      indCond:  ['conduciría','conducirías','conduciría','conduciríamos','conduciríais','conducirían'],
+      subjPres: ['conduzca','conduzcas','conduzca','conduzcamos','conduzcáis','conduzcan'],
+      subjImp:  ['condujera','condujeras','condujera','condujéramos','condujerais','condujeran']
+    }
+  },
+  dormir: {
+    tipo:'irregular', conjugacion:'ir', participio:'dormido',
+    formas:{
+      indPres:  ['duermo','duermes','duerme','dormimos','dormís','duermen'],
+      indImp:   ['dormía','dormías','dormía','dormíamos','dormíais','dormían'],
+      indPS:    ['dormí','dormiste','durmió','dormimos','dormisteis','durmieron'],
+      indFut:   ['dormiré','dormirás','dormirá','dormiremos','dormiréis','dormirán'],
+      indCond:  ['dormiría','dormirías','dormiría','dormiríamos','dormiríais','dormirían'],
+      subjPres: ['duerma','duermas','duerma','durmamos','durmáis','duerman'],
+      subjImp:  ['durmiera','durmieras','durmiera','durmiéramos','durmierais','durmieran']
+    }
+  },
+  pedir: {
+    tipo:'irregular', conjugacion:'ir', participio:'pedido',
+    formas:{
+      indPres:  ['pido','pides','pide','pedimos','pedís','piden'],
+      indImp:   ['pedía','pedías','pedía','pedíamos','pedíais','pedían'],
+      indPS:    ['pedí','pediste','pidió','pedimos','pedisteis','pidieron'],
+      indFut:   ['pediré','pedirás','pedirá','pediremos','pediréis','pedirán'],
+      indCond:  ['pediría','pedirías','pediría','pediríamos','pediríais','pedirían'],
+      subjPres: ['pida','pidas','pida','pidamos','pidáis','pidan'],
+      subjImp:  ['pidiera','pidieras','pidiera','pidiéramos','pidierais','pidieran']
+    }
+  },
+  sentir: {
+    tipo:'irregular', conjugacion:'ir', participio:'sentido',
+    formas:{
+      indPres:  ['siento','sientes','siente','sentimos','sentís','sienten'],
+      indImp:   ['sentía','sentías','sentía','sentíamos','sentíais','sentían'],
+      indPS:    ['sentí','sentiste','sintió','sentimos','sentisteis','sintieron'],
+      indFut:   ['sentiré','sentirás','sentirá','sentiremos','sentiréis','sentirán'],
+      indCond:  ['sentiría','sentirías','sentiría','sentiríamos','sentiríais','sentirían'],
+      subjPres: ['sienta','sientas','sienta','sintamos','sintáis','sientan'],
+      subjImp:  ['sintiera','sintieras','sintiera','sintiéramos','sintierais','sintieran']
+    }
+  },
+  oír: {
+    tipo:'irregular', conjugacion:'ir', participio:'oído',
+    formas:{
+      indPres:  ['oigo','oyes','oye','oímos','oís','oyen'],
+      indImp:   ['oía','oías','oía','oíamos','oíais','oían'],
+      indPS:    ['oí','oíste','oyó','oímos','oísteis','oyeron'],
+      indFut:   ['oiré','oirás','oirá','oiremos','oiréis','oirán'],
+      indCond:  ['oiría','oirías','oiría','oiríamos','oiríais','oirían'],
+      subjPres: ['oiga','oigas','oiga','oigamos','oigáis','oigan'],
+      subjImp:  ['oyera','oyeras','oyera','oyéramos','oyerais','oyeran']
+    }
+  },
+  andar: {
+    tipo:'irregular', conjugacion:'ar', participio:'andado',
+    formas:{
+      indPres:  ['ando','andas','anda','andamos','andáis','andan'],
+      indImp:   ['andaba','andabas','andaba','andábamos','andabais','andaban'],
+      indPS:    ['anduve','anduviste','anduvo','anduvimos','anduvisteis','anduvieron'],
+      indFut:   ['andaré','andarás','andará','andaremos','andaréis','andarán'],
+      indCond:  ['andaría','andarías','andaría','andaríamos','andaríais','andarían'],
+      subjPres: ['ande','andes','ande','andemos','andéis','anden'],
+      subjImp:  ['anduviera','anduvieras','anduviera','anduviéramos','anduvierais','anduvieran']
+    }
+  },
+  caber: {
+    tipo:'irregular', conjugacion:'er', participio:'cabido',
+    formas:{
+      indPres:  ['quepo','cabes','cabe','cabemos','cabéis','caben'],
+      indImp:   ['cabía','cabías','cabía','cabíamos','cabíais','cabían'],
+      indPS:    ['cupe','cupiste','cupo','cupimos','cupisteis','cupieron'],
+      indFut:   ['cabré','cabrás','cabrá','cabremos','cabréis','cabrán'],
+      indCond:  ['cabría','cabrías','cabría','cabríamos','cabríais','cabrían'],
+      subjPres: ['quepa','quepas','quepa','quepamos','quepáis','quepan'],
+      subjImp:  ['cupiera','cupieras','cupiera','cupiéramos','cupierais','cupieran']
+    }
+  },
+  salir: {
+    tipo:'irregular', conjugacion:'ir', participio:'salido',
+    formas:{
+      indPres:  ['salgo','sales','sale','salimos','salís','salen'],
+      indImp:   ['salía','salías','salía','salíamos','salíais','salían'],
+      indPS:    ['salí','saliste','salió','salimos','salisteis','salieron'],
+      indFut:   ['saldré','saldrás','saldrá','saldremos','saldréis','saldrán'],
+      indCond:  ['saldría','saldrías','saldría','saldríamos','saldríais','saldrían'],
+      subjPres: ['salga','salgas','salga','salgamos','salgáis','salgan'],
+      subjImp:  ['saliera','salieras','saliera','saliéramos','salierais','salieran']
+    }
+  },
+  caer: {
+    tipo:'irregular', conjugacion:'er', participio:'caído',
+    formas:{
+      indPres:  ['caigo','caes','cae','caemos','caéis','caen'],
+      indImp:   ['caía','caías','caía','caíamos','caíais','caían'],
+      indPS:    ['caí','caíste','cayó','caímos','caísteis','cayeron'],
+      indFut:   ['caeré','caerás','caerá','caeremos','caeréis','caerán'],
+      indCond:  ['caería','caerías','caería','caeríamos','caeríais','caerían'],
+      subjPres: ['caiga','caigas','caiga','caigamos','caigáis','caigan'],
+      subjImp:  ['cayera','cayeras','cayera','cayéramos','cayerais','cayeran']
+    }
+  },
+  valer: {
+    tipo:'irregular', conjugacion:'er', participio:'valido',
+    formas:{
+      indPres:  ['valgo','vales','vale','valemos','valéis','valen'],
+      indImp:   ['valía','valías','valía','valíamos','valíais','valían'],
+      indPS:    ['valí','valiste','valió','valimos','valisteis','valieron'],
+      indFut:   ['valdré','valdrás','valdrá','valdremos','valdréis','valdrán'],
+      indCond:  ['valdría','valdrías','valdría','valdríamos','valdríais','valdrían'],
+      subjPres: ['valga','valgas','valga','valgamos','valgáis','valgan'],
+      subjImp:  ['valiera','valieras','valiera','valiéramos','valierais','valieran']
+    }
+  }
+};
+
+/* ============================================================
+   ESTADO GLOBAL
+============================================================ */
+const ST = {
+  /* Generador */
+  filtroGen: 'todos',
+  girando:   false,
+  tiradas:   0,
+  resultadoActual: null,
+  /* Análisis */
+  modoAna:     'ref',     // 'ref' | 'int'
+  dificultad:  'facil',
+  anaActual:   null,
+  scoreOk:     0,
+  scoreErr:    0
+};
+
+/* ============================================================
+   UTILIDADES
+============================================================ */
+function rand(arr){ return arr[Math.floor(Math.random() * arr.length)] }
+function el(id)   { return document.getElementById(id) }
+
+/* ============================================================
+   TEMA OSCURO/CLARO
+============================================================ */
+el('themeBtn').addEventListener('click', () => {
+  const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.documentElement.setAttribute('data-theme', dark ? 'light' : 'dark');
+  el('themeBtn').textContent = dark ? '🌙' : '☀️';
+});
+
+/* ============================================================
+   PESTAÑAS PRINCIPALES
+============================================================ */
+function showTab(id, btn){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  el('screen-'+id).classList.add('active');
+  btn.classList.add('active');
+  if(id === 'ana' && !ST.anaActual) nuevaFormaAna();
+}
+
+/* ============================================================
+   FILTRO DE VERBOS
+============================================================ */
+function setFiltro(btn, scope){
+  document.querySelectorAll('#fchipsGen .fchip').forEach(c => c.classList.remove('on'));
+  btn.classList.add('on');
+  ST.filtroGen = btn.dataset.f;
+}
+
+function verbosSegun(filtro){
+  const claves = Object.keys(VERBOS);
+  if(filtro === 'todos')       return claves;
+  if(filtro === 'regulares')   return claves.filter(k => VERBOS[k].tipo === 'regular');
+  if(filtro === 'irregulares') return claves.filter(k => VERBOS[k].tipo === 'irregular');
+  return claves.filter(k => VERBOS[k].conjugacion === filtro);
+}
+
+/* ============================================================
+   OBTENER LISTA DE TIEMPOS DISPONIBLES
+   Tres modos: 'simples' | 'solocomp' | 'ambas'
+   Delegamos en tiemposDispPara (definida junto a girarUna)
+   para no duplicar la lógica.
+============================================================ */
+function tiemposDisp(modo){ return tiemposDispPara(modo); }
+
+/* ============================================================
+   toEse(): convierte formas en -ra/-ara/-iera a sus equivalentes en -se
+   Sufijos más largos primero para evitar solapamientos.
+   Cubre -ara→-ase, -iera→-iese, -era→-ese y sus plurales,
+   incluidas formas de nosotros con tilde: -áramos→-ásemos, etc.
+============================================================ */
+function toEse(forms){
+  return forms.map(f => f
+    .replace(/áramos$/, 'ásemos')
+    .replace(/iéramos$/, 'iésemos')
+    .replace(/éramos$/, 'ésemos')
+    .replace(/arais$/,  'aseis')
+    .replace(/ierais$/, 'ieseis')
+    .replace(/erais$/,  'eseis')
+    .replace(/aran$/,   'asen')
+    .replace(/ieran$/,  'iesen')
+    .replace(/eran$/,   'esen')
+    .replace(/iera$/,   'iese')
+    .replace(/ieras$/,  'ieses')
+    .replace(/era$/,    'ese')
+    .replace(/eras$/,   'eses')
+    .replace(/ara$/,    'ase')
+    .replace(/aras$/,   'ases')
+  );
+}
+
+/* ============================================================
+   CONSTRUIR FORMA VERBAL
+   - Forma compuesta: HABER[haberKey][idx] + participio
+   - subjImpEse: calcula la forma -se a partir de subjImp con toEse()
+   - Forma simple: verbo.formas[tiempoId][idx]
+============================================================ */
+function getForma(verboKey, tiempoObj, personaIdx){
+  const v = VERBOS[verboKey];
+  if(!v) return '—';
+  if(tiempoObj.haberKey){
+    /* Forma compuesta */
+    return HABER[tiempoObj.haberKey][personaIdx] + ' ' + v.participio;
+  }
+  if(tiempoObj.id === 'subjImpEse'){
+    /* Imperfecto de subjuntivo -se: se deriva dinámicamente de subjImp */
+    return toEse(v.formas['subjImp'])[personaIdx];
+  }
+  /* Forma simple almacenada */
+  const arr = v.formas[tiempoObj.id];
+  return arr ? arr[personaIdx] : '—';
+}
+
+/* ============================================================
+   AMBIGÜEDAD PERSONA 1.ª / 3.ª SINGULAR
+   Compara directamente las formas generadas para los índices 0 (yo) y 2 (él/ella).
+   Si son idénticas, la persona es morfológicamente indeterminada entre ambas.
+   Esto cubre: pretérito imperfecto de indicativo, condicional simple,
+   presente y pretérito imperfecto de subjuntivo, y todas las formas compuestas
+   construidas sobre auxiliares que también coinciden (había, habría, haya, hubiera).
+============================================================ */
+function formaAmbigua13(verboKey, tiempoObj){
+  return getForma(verboKey, tiempoObj, 0) === getForma(verboKey, tiempoObj, 2);
+}
+
+/* ============================================================
+   ANIMACIÓN RULETA
+   Cicla por valores con velocidad decreciente y termina en valorFinal.
+============================================================ */
+function animarRuleta(tapeId, reelId, valores, valorFinal, delay, pasos){
+  return new Promise(resolve => {
+    const tape = el(tapeId);
+    const reel = el(reelId);
+    reel.classList.add('spinning');
+    let paso = 0;
+    function ciclo(){
+      if(paso < pasos){
+        tape.innerHTML = `<div class="reel-item">${valores[paso % valores.length]}</div>`;
+        paso++;
+        /* Acelera al principio, frena al final */
+        const f = paso / pasos;
+        const ms = f < 0.5 ? 60 : 60 + Math.pow((f - 0.5) / 0.5, 2.5) * 500;
+        setTimeout(ciclo, ms);
+      } else {
+        tape.innerHTML = `<div class="reel-item">${valorFinal}</div>`;
+        reel.classList.remove('spinning');
+        resolve();
+      }
+    }
+    setTimeout(ciclo, delay);
+  });
+}
+
+/* ============================================================
+   LUCES DECORATIVAS
+============================================================ */
+let _lightInt = null;
+function startLights(){
+  const classes = ['on-r','on-y','on-g','on-b'];
+  let i = 0;
+  _lightInt = setInterval(() => {
+    document.querySelectorAll('.mlight').forEach((l,n) => {
+      l.className = 'mlight';
+      if(Math.random() > 0.4) l.classList.add(classes[(n+i)%4]);
+    });
+    i++;
+  }, 200);
+}
+function stopLights(){
+  clearInterval(_lightInt);
+  document.querySelectorAll('.mlight').forEach(l => {
+    l.className = 'mlight on-g';
+  });
+  setTimeout(() => {
+    document.querySelectorAll('.mlight').forEach(l => l.className = 'mlight');
+  }, 800);
+}
+
+/* ============================================================
+   getModos(): lee el triple radio y devuelve el array de modos activos
+============================================================ */
+function getModos(){
+  const v = document.querySelector('input[name="rModo"]:checked').value;
+  if(v === 'indicativo') return ['indicativo'];
+  if(v === 'subjuntivo') return ['subjuntivo'];
+  return ['indicativo','subjuntivo'];
+}
+
+/* ============================================================
+   GIRAR RULETAS (Pantalla 1)
+============================================================ */
+async function girarRuletas(){
+  if(ST.girando) return;
+
+  const disponibles = verbosSegun(ST.filtroGen);
+  if(!disponibles.length){
+    alert('No hay verbos con ese filtro. Por favor selecciona otro.');
+    return;
+  }
+
+  ST.girando = true;
+  ST.tiradas++;
+  el('counterPill').textContent = 'Tiradas: ' + ST.tiradas;
+  el('btnGirar').disabled = true;
+  el('resArea').classList.add('hidden');
+
+  /* ── Selección aleatoria ── */
+  const personaObj = rand(PERSONAS);
+  const modos      = getModos();
+  const modo       = rand(modos);
+  const tiempoObj  = rand(tiemposDisp(modo));
+  const verboKey   = rand(disponibles);
+  const verboDato  = VERBOS[verboKey];
+  const forma      = getForma(verboKey, tiempoObj, personaObj.idx);
+  const esSimple   = !tiempoObj.haberKey;
+
+  ST.resultadoActual = { personaObj, modo, tiempoObj, verboKey, verboDato, forma, esSimple };
+
+  /* ── Listas para animar ── */
+  const vPers = PERSONAS.map(p => p.pronombre);
+  const vMod  = ['indicativo','subjuntivo'];
+  const vTiem = [
+    ...TIEMPOS.indicativo.simples, ...TIEMPOS.indicativo.compuestos,
+    ...TIEMPOS.subjuntivo.simples, ...TIEMPOS.subjuntivo.compuestos
+  ].map(t => t.label);
+  const vVerb = disponibles;
+
+  startLights();
+  const N = 24;
+  await Promise.all([
+    animarRuleta('rtPersona','rwPersona', vPers, personaObj.pronombre,     0, N),
+    animarRuleta('rtModo',   'rwModo',    vMod,  modo,                   200, N+4),
+    animarRuleta('rtTiempo', 'rwTiempo',  vTiem, tiempoObj.label,        400, N+8),
+    animarRuleta('rtVerbo',  'rwVerbo',   vVerb, verboKey+' (-'+verboDato.conjugacion+')', 600, N+12)
+  ]);
+  stopLights();
+
+  mostrarResultadoGen();
+  ST.girando = false;
+  el('btnGirar').disabled = false;
+}
+
+/* ============================================================
+   MOSTRAR RESULTADO (Pantalla 1)
+============================================================ */
+function mostrarResultadoGen(){
+  const r = ST.resultadoActual;
+  if(!r) return;
+  const area = el('resArea');
+  area.classList.remove('hidden');
+
+  const tagClass = r.verboDato.tipo === 'regular' ? 'tag-reg' : 'tag-irr';
+  const tagIcon  = r.verboDato.tipo === 'regular' ? '✓' : '★';
+
+  /* La solución (forma conjugada) SIEMPRE empieza oculta.
+     Se revela únicamente al pulsar "Mostrar solución". */
+  const html = `
+    <div class="result-card highlight">
+      <span class="tipo-tag ${tagClass}">${tagIcon} ${r.verboDato.tipo} · -${r.verboDato.conjugacion}</span>
+
+      <!-- Datos de la tirada: siempre visibles -->
+      <div class="details-grid" style="margin-bottom:20px">
+        ${det('👤 Persona',  r.personaObj.pronombre)}
+        ${det('📚 Modo',     r.modo)}
+        ${det('⏱️ Tiempo',   r.tiempoObj.label)}
+        ${det('📝 Verbo',    r.verboKey)}
+        ${det('📋 Forma',    r.esSimple ? 'simple' : 'compuesta')}
+      </div>
+
+      <!-- Zona de solución: oculta hasta que el usuario pulse el botón -->
+      <div id="zonaBotonSol" style="text-align:center;margin-bottom:6px">
+        <button class="btn btn-primary" onclick="revelarFormaGen()">
+          👁️ Mostrar solución
+        </button>
+      </div>
+      <div id="zonaSolucion" class="hidden">
+        <div class="forma-display">${r.forma}</div>
+        <div class="details-grid" style="margin-top:10px">
+          ${(()=>{
+            const ambigua = formaAmbigua13(r.verboKey, r.tiempoObj) && (r.personaObj.idx===0||r.personaObj.idx===2);
+            const nota = ambigua
+              ? r.personaObj.persona + ' del singular <span style="color:var(--accent2);font-size:.8em">⚠️ forma idéntica a la ' + (r.personaObj.idx===0?'3.ª':'1.ª') + ' persona</span>'
+              : r.personaObj.persona + ' del ' + r.personaObj.numero;
+            return `<div class="det-item"><div class="det-lbl">👤 Persona</div><div class="det-val">${nota}</div></div>`;
+          })()}
+        </div>
+      </div>
+
+      <div class="res-footer">
+        <button class="btn btn-audio btn-sm" onclick="escucharGen()">🔊 Escuchar</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-secondary btn-sm" onclick="girarRuletas()">🎲 Nueva tirada</button>
+          <button class="btn btn-secondary btn-sm" onclick="reiniciarGen()">🔄 Reiniciar</button>
+        </div>
+      </div>
+    </div>`;
+
+  area.innerHTML = html;
+}
+
+function det(lbl, val){
+  return `<div class="det-item"><div class="det-lbl">${lbl}</div><div class="det-val">${val}</div></div>`;
+}
+
+function revelarFormaGen(){
+  const zona = el('zonaSolucion');
+  const boton = el('zonaBotonSol');
+  if(zona)  zona.classList.remove('hidden');
+  if(boton) boton.classList.add('hidden');
+  /* Leer la forma en voz alta automáticamente al revelar */
+  if(ST.resultadoActual) hablar(ST.resultadoActual.forma);
+}
+
+function reiniciarGen(){
+  ST.resultadoActual = null;
+  el('resArea').classList.add('hidden');
+  ['rtPersona','rtModo','rtTiempo','rtVerbo'].forEach(id => {
+    el(id).innerHTML = '<div class="reel-item">—</div>';
+  });
+  ST.tiradas = 0;
+  el('counterPill').textContent = 'Tiradas: 0';
+}
+
+/* ============================================================
+   GIRAR UNA SOLA RULETA
+   Permite al usuario cambiar únicamente el elemento que no le
+   gusta sin alterar los demás. Si aún no hay tirada inicial,
+   lanza la tirada completa.
+   ruleta: 'persona' | 'modo' | 'tiempo' | 'verbo'
+============================================================ */
+async function girarUna(ruleta){
+  if(ST.girando) return;
+  /* Si todavía no hay resultado, hacer tirada completa */
+  if(!ST.resultadoActual){ girarRuletas(); return; }
+
+  ST.girando = true;
+  el('btnGirar').disabled = true;
+  /* Ocultar resultado mientras giramos */
+  el('resArea').classList.add('hidden');
+
+  const r   = ST.resultadoActual;
+  const disp = verbosSegun(ST.filtroGen);
+
+  let nuevaPersona  = r.personaObj;
+  let nuevoModo     = r.modo;
+  let nuevoTiempo   = r.tiempoObj;
+  let nuevoVerboKey = r.verboKey;
+
+  const vPers = PERSONAS.map(p => p.pronombre);
+  const vMod  = ['indicativo','subjuntivo'];
+  const vTiem = [
+    ...TIEMPOS.indicativo.simples, ...TIEMPOS.indicativo.compuestos,
+    ...TIEMPOS.subjuntivo.simples, ...TIEMPOS.subjuntivo.compuestos
+  ].map(t => t.label);
+  const vVerb = disp;
+
+  const N = 18; // menos pasos que el giro completo: efecto más rápido
+
+  if(ruleta === 'persona'){
+    nuevaPersona = rand(PERSONAS);
+    await animarRuleta('rtPersona','rwPersona', vPers, nuevaPersona.pronombre, 0, N);
+  }
+  else if(ruleta === 'modo'){
+    const modos = getModos();
+    nuevoModo   = rand(modos);
+    /* Si el nuevo modo no tiene el tiempo actual, sortear tiempo también */
+    const tiemposNuevoModo = tiemposDispPara(nuevoModo);
+    if(!tiemposNuevoModo.find(t => t.id === nuevoTiempo.id)){
+      nuevoTiempo = rand(tiemposNuevoModo);
+      await Promise.all([
+        animarRuleta('rtModo',   'rwModo',   vMod,  nuevoModo,         0, N),
+        animarRuleta('rtTiempo', 'rwTiempo', vTiem, nuevoTiempo.label, 0, N)
+      ]);
+    } else {
+      await animarRuleta('rtModo','rwModo', vMod, nuevoModo, 0, N);
+    }
+  }
+  else if(ruleta === 'tiempo'){
+    /* Rolar solo entre los tiempos del modo actual */
+    const lista = tiemposDispPara(nuevoModo);
+    nuevoTiempo = rand(lista);
+    await animarRuleta('rtTiempo','rwTiempo', vTiem, nuevoTiempo.label, 0, N);
+  }
+  else if(ruleta === 'verbo'){
+    if(!disp.length){ ST.girando = false; el('btnGirar').disabled = false; return; }
+    nuevoVerboKey = rand(disp);
+    await animarRuleta('rtVerbo','rwVerbo', vVerb,
+      nuevoVerboKey+' (-'+VERBOS[nuevoVerboKey].conjugacion+')', 0, N);
+  }
+
+  /* Recalcular la forma con los valores (posiblemente mixtos) actualizados */
+  const verboDato = VERBOS[nuevoVerboKey];
+  const forma     = getForma(nuevoVerboKey, nuevoTiempo, nuevaPersona.idx);
+  const esSimple  = !nuevoTiempo.haberKey;
+
+  ST.resultadoActual = {
+    personaObj: nuevaPersona,
+    modo:       nuevoModo,
+    tiempoObj:  nuevoTiempo,
+    verboKey:   nuevoVerboKey,
+    verboDato,
+    forma,
+    esSimple
+  };
+
+  mostrarResultadoGen();
+  ST.girando = false;
+  el('btnGirar').disabled = false;
+}
+
+/* Versión de tiemposDisp que acepta el modo como parámetro
+   en lugar de leerlo del estado (útil dentro de girarUna) */
+function tiemposDispPara(modo){
+  const cfg   = TIEMPOS[modo];
+  const valor = document.querySelector('input[name="rFormas"]:checked').value;
+  if(valor === 'simples')  return [...cfg.simples];
+  if(valor === 'solocomp') return [...cfg.compuestos];
+  return [...cfg.simples, ...cfg.compuestos];
+}
+
+/* ============================================================
+   SÍNTESIS DE VOZ
+============================================================ */
+function hablar(texto){
+  if(!('speechSynthesis' in window)){ alert('Tu navegador no soporta síntesis de voz.'); return; }
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(texto);
+  u.lang = 'es-ES'; u.rate = 0.88; u.pitch = 1;
+  window.speechSynthesis.speak(u);
+}
+function escucharGen(){
+  if(ST.resultadoActual) hablar(ST.resultadoActual.forma);
+}
+function escucharAna(){
+  if(ST.anaActual) hablar(ST.anaActual.forma);
+}
+
+/* ============================================================
+   PANTALLA 2 – ANÁLISIS MORFOLÓGICO
+============================================================ */
+
+/* Configuraciones por dificultad */
+const DIFCONF = {
+  facil: {
+    modos: ['indicativo'],
+    tipos: 'simples',
+    /* Solo los tiempos más frecuentes de indicativo */
+    tiemposPermitidos: ['indPres','indImp','indPS'],
+    verbosPermitidos: [
+      'cantar','bailar','hablar','estudiar','trabajar','comer','vivir',
+      'beber','partir','abrir','escribir','ser','estar','ir','tener',
+      'hacer','ver','querer','poder','dar','decir','saber'
+    ]
+  },
+  media: {
+    modos: ['indicativo','subjuntivo'],
+    tipos: 'simples',  // solo formas simples, pero ya con subjuntivo
+    tiemposPermitidos: null,
+    verbosPermitidos: null
+  },
+  alta: {
+    modos: ['indicativo','subjuntivo'],
+    tipos: 'ambas',    // simples y compuestas de ambos modos
+    tiemposPermitidos: null,
+    verbosPermitidos: null
+  }
+};
+
+function setDificultad(btn){
+  document.querySelectorAll('.diff-btn').forEach(b => b.className = 'diff-btn');
+  const d = btn.dataset.d;
+  btn.classList.add('on-'+d[0]);
+  ST.dificultad = d;
+  nuevaFormaAna();
+}
+
+function setModoAna(modo, btn){
+  document.querySelectorAll('.atab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  ST.modoAna = modo;
+  el('panelRef').classList.toggle('hidden', modo !== 'ref');
+  el('panelInt').classList.toggle('hidden', modo !== 'int');
+  el('revelado').classList.add('hidden');
+  el('feedbackInt').classList.add('hidden');
+  el('solucionInt').classList.add('hidden');
+  nuevaFormaAna();
+}
+
+/* Genera una nueva forma verbal para el análisis */
+function nuevaFormaAna(){
+  const cfg = DIFCONF[ST.dificultad];
+
+  /* 1. Seleccionar modo */
+  const modo = rand(cfg.modos);
+
+  /* 2. Seleccionar tiempo */
+  let tiempos = [...TIEMPOS[modo].simples];
+  if(cfg.tipos === 'solocomp') tiempos = [...TIEMPOS[modo].compuestos];
+  if(cfg.tipos === 'ambas')    tiempos = tiempos.concat(TIEMPOS[modo].compuestos);
+
+  /* Para dificultad fácil, filtrar tiempos permitidos */
+  if(cfg.tiemposPermitidos){
+    tiempos = tiempos.filter(t => cfg.tiemposPermitidos.includes(t.id));
+  }
+  if(!tiempos.length) tiempos = [...TIEMPOS[modo].simples]; // fallback
+  const tiempoObj = rand(tiempos);
+
+  /* 3. Seleccionar verbo */
+  let claves = cfg.verbosPermitidos ? cfg.verbosPermitidos : Object.keys(VERBOS);
+  const verboKey = rand(claves);
+  const verboDato = VERBOS[verboKey];
+
+  /* 4. Seleccionar persona */
+  const personaObj = rand(PERSONAS);
+
+  /* 5. Construir forma */
+  const forma    = getForma(verboKey, tiempoObj, personaObj.idx);
+  const esSimple = !tiempoObj.haberKey;
+
+  ST.anaActual = { personaObj, modo, tiempoObj, verboKey, verboDato, forma, esSimple };
+
+  /* Mostrar forma en grande */
+  el('anaForma').textContent = forma;
+
+  /* Limpiar áreas de feedback/revelado */
+  el('revelado').classList.add('hidden');
+  el('feedbackInt').classList.add('hidden');
+  el('solucionInt').classList.add('hidden');
+
+  /* Si estamos en modo interactivo, construir los selectores */
+  if(ST.modoAna === 'int') buildInteractivo();
+}
+
+/* ── MODO REFLEXIÓN: revelar análisis completo ── */
+function revelarAnalisis(){
+  const r = ST.anaActual;
+  if(!r) return;
+
+  const esSingular  = r.personaObj.numero === 'singular';
+  const esPrimOTerc = r.personaObj.idx === 0 || r.personaObj.idx === 2;
+  const ambigua     = esSingular && esPrimOTerc && formaAmbigua13(r.verboKey, r.tiempoObj);
+
+  const notaPersona = ambigua
+    ? r.personaObj.persona + ' <small style="opacity:.75">(o ' + (r.personaObj.idx===0?'3.ª':'1.ª') + ' persona: forma idéntica en este tiempo)</small>'
+    : r.personaObj.persona;
+
+  let html = '<div class="reveal-grid">';
+  if(el('chkInf').checked) html += revItem('📝 Infinitivo',   r.verboKey);
+  if(el('chkPer').checked) html += revItem('👤 Persona',       notaPersona);
+  if(el('chkNum').checked) html += revItem('🔢 Número',        r.personaObj.numero);
+  if(el('chkMod').checked) html += revItem('📚 Modo',          r.modo);
+  if(el('chkTie').checked) html += revItem('⏱️ Tiempo verbal', r.tiempoObj.label);
+  if(el('chkTip').checked) html += revItem('📋 Tipo de forma', r.esSimple ? 'simple' : 'compuesta');
+  if(r.verboDato)           html += revItem('📌 Tipo de verbo', r.verboDato.tipo + ' (-' + r.verboDato.conjugacion + ')');
+  html += '</div>';
+
+  el('revelado').innerHTML = html;
+  el('revelado').classList.remove('hidden');
+}
+
+function revItem(lbl, val){
+  return `<div class="rev-item"><div class="rev-lbl">${lbl}</div><div class="rev-val">${val}</div></div>`;
+}
+
+/* ── MODO INTERACTIVO: construir selectores ── */
+function buildInteractivo(){
+  const grid = el('interactivoGrid');
+  grid.innerHTML = '';
+  const show = {
+    inf: el('chkInf').checked,
+    per: el('chkPer').checked,
+    num: el('chkNum').checked,
+    mod: el('chkMod').checked,
+    tie: el('chkTie').checked,
+    tip: el('chkTip').checked
+  };
+
+  /* Opciones de persona */
+  const optsPersona = PERSONAS.map(p => p.persona).filter((v,i,a) => a.indexOf(v) === i);
+  /* Opciones de número */
+  const optsNumero  = ['singular','plural'];
+  /* Opciones de modo */
+  const optsModo    = ['indicativo','subjuntivo'];
+  /* Opciones de tiempo (todos) */
+  const optsTiempos = [
+    ...TIEMPOS.indicativo.simples,
+    ...TIEMPOS.indicativo.compuestos,
+    ...TIEMPOS.subjuntivo.simples,
+    ...TIEMPOS.subjuntivo.compuestos
+  ].map(t => t.label);
+  /* Opciones tipo */
+  const optsTipo    = ['simple','compuesta'];
+
+  if(show.inf) grid.innerHTML += iField('iInf', '📝 Infinitivo', Object.keys(VERBOS));
+  if(show.per) grid.innerHTML += iField('iPer', '👤 Persona',    optsPersona);
+  if(show.num) grid.innerHTML += iField('iNum', '🔢 Número',     optsNumero);
+  if(show.mod) grid.innerHTML += iField('iMod', '📚 Modo',       optsModo);
+  if(show.tie) grid.innerHTML += iField('iTie', '⏱️ Tiempo',     [...new Set(optsTiempos)]);
+  if(show.tip) grid.innerHTML += iField('iTip', '📋 Tipo',       optsTipo);
+}
+
+function iField(id, lbl, opciones){
+  const opts = opciones.map(o => `<option value="${o}">${o}</option>`).join('');
+  return `
+    <div class="ifield">
+      <label for="${id}">${lbl}</label>
+      <select class="iselect" id="${id}">
+        <option value="">– elige –</option>
+        ${opts}
+      </select>
+    </div>`;
+}
+
+/* ── CORREGIR RESPUESTAS INTERACTIVAS ── */
+function corregirInteractivo(){
+  const r = ST.anaActual;
+  if(!r){ nuevaFormaAna(); return; }
+  const show = {
+    inf: el('chkInf').checked,
+    per: el('chkPer').checked,
+    num: el('chkNum').checked,
+    mod: el('chkMod').checked,
+    tie: el('chkTie').checked,
+    tip: el('chkTip').checked
+  };
+
+  let correctas = 0, total = 0;
+  // Detectar ambigüedad 1.ª/3.ª singular para este ejercicio concreto
+  const esSingular = r.personaObj.numero === 'singular';
+  const esPrimOTerc = r.personaObj.idx === 0 || r.personaObj.idx === 2;
+  const ambigua = esSingular && esPrimOTerc && formaAmbigua13(r.verboKey, r.tiempoObj);
+
+  function chk(chkKey, selectId, valorCorrecto){
+    if(!show[chkKey]) return;
+    const sel = el(selectId);
+    if(!sel) return;
+    total++;
+    const resp = sel.value.trim().toLowerCase();
+    const ok = resp === valorCorrecto.toLowerCase();
+    sel.className = 'iselect ' + (ok ? 'sel-ok' : 'sel-err');
+    if(ok) correctas++;
+  }
+
+  // Persona: tratamiento especial cuando la forma es ambigua
+  if(show.per){
+    const sel = el('iPer');
+    if(sel){
+      total++;
+      const resp = sel.value.trim().toLowerCase();
+      const correcto = r.personaObj.persona.toLowerCase();
+      let ok = resp === correcto;
+      // Si la forma es morfológicamente idéntica para 1.ª y 3.ª del singular,
+      // aceptar cualquiera de las dos como correcta
+      if(!ok && ambigua && (resp === '1.ª persona' || resp === '3.ª persona')){
+        ok = true;
+      }
+      sel.className = 'iselect ' + (ok ? 'sel-ok' : 'sel-err');
+      if(ok) correctas++;
+    }
+  }
+
+  chk('inf', 'iInf', r.verboKey);
+  chk('num', 'iNum', r.personaObj.numero);
+  chk('mod', 'iMod', r.modo);
+  chk('tie', 'iTie', r.tiempoObj.label);
+  chk('tip', 'iTip', r.esSimple ? 'simple' : 'compuesta');
+
+  if(total === 0){ alert('Activa al menos un aspecto a analizar.'); return; }
+
+  /* Actualizar marcador */
+  if(correctas === total){
+    ST.scoreOk++;
+    el('sOk').textContent = ST.scoreOk;
+  } else {
+    ST.scoreErr++;
+    el('sErr').textContent = ST.scoreErr;
+  }
+
+  /* Feedback visual */
+  const fb = el('feedbackInt');
+  fb.classList.remove('hidden','fb-ok','fb-par','fb-err');
+  let fbClass, fbText;
+  if(correctas === total){
+    fbClass = 'fb-ok';
+    fbText  = ambigua && show.per
+      ? '✅ ¡Correcto! (Nota: la forma es idéntica para la 1.ª y la 3.ª persona del singular)'
+      : '✅ ¡Perfecto! Todas las respuestas son correctas.';
+  } else if(correctas > 0){
+    fbClass = 'fb-par';
+    fbText  = `⚠️ ${correctas} de ${total} correctas. Revisa las marcadas en rojo.`;
+    if(ambigua && show.per) fbText += ' Recuerda que persona 1.ª y 3.ª del singular tienen la misma forma en este tiempo.';
+  } else {
+    fbClass = 'fb-err';
+    fbText  = '❌ Ninguna correcta. ¡No te rindas, vuelve a intentarlo!';
+  }
+  fb.className = 'feedback ' + fbClass;
+  fb.textContent = fbText;
+
+  /* Mostrar solución debajo */
+  const sol = el('solucionInt');
+  sol.classList.remove('hidden');
+  let sHTML = '<div class="reveal-grid">';
+  if(show.inf) sHTML += revItem('📝 Infinitivo', r.verboKey);
+  if(show.per){
+    const notaPersona = ambigua
+      ? r.personaObj.persona + ' <small style="opacity:.75">(o '+(r.personaObj.idx===0?'3.ª':'1.ª')+' persona: forma idéntica)</small>'
+      : r.personaObj.persona;
+    sHTML += revItem('👤 Persona', notaPersona);
+  }
+  if(show.num) sHTML += revItem('🔢 Número',     r.personaObj.numero);
+  if(show.mod) sHTML += revItem('📚 Modo',        r.modo);
+  if(show.tie) sHTML += revItem('⏱️ Tiempo',      r.tiempoObj.label);
+  if(show.tip) sHTML += revItem('📋 Tipo',        r.esSimple ? 'simple' : 'compuesta');
+  sHTML += '</div>';
+  sol.innerHTML = sHTML;
+}
+
+function resetScore(){
+  ST.scoreOk = ST.scoreErr = 0;
+  el('sOk').textContent = '0';
+  el('sErr').textContent = '0';
+}
+
+/* ============================================================
+   INICIALIZACIÓN
+============================================================ */
+window.addEventListener('DOMContentLoaded', () => {
+  /* La primera forma de análisis se genera al cambiar de pestaña */
+});
+</script>
+</body>
+</html>
