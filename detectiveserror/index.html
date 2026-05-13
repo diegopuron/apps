@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Detectives del Error</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --bg-soft: #111827;
+      --card: #f8fafc;
+      --card-soft: #e2e8f0;
+      --text: #0f172a;
+      --text-light: #f8fafc;
+      --muted: #64748b;
+      --accent: #2563eb;
+      --accent-dark: #1d4ed8;
+      --good: #15803d;
+      --bad: #b91c1c;
+      --warning: #ca8a04;
+      --locked: #475569;
+      --radius: 22px;
+      --shadow: 0 18px 45px rgba(0, 0, 0, 0.25);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(37, 99, 235, 0.35), transparent 34rem),
+        linear-gradient(135deg, #020617, #0f172a 45%, #111827);
+      color: var(--text-light);
+    }
+
+    button, input, textarea, select { font: inherit; }
+    button { cursor: pointer; border: 0; }
+
+    .app {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 48px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo {
+      width: 56px;
+      height: 56px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #60a5fa, #1d4ed8);
+      box-shadow: 0 12px 30px rgba(37, 99, 235, 0.4);
+      font-size: 30px;
+    }
+
+    h1, h2, h3, p { margin: 0; }
+
+    h1 {
+      font-size: clamp(2rem, 5vw, 4rem);
+      line-height: 0.95;
+      letter-spacing: -0.06em;
+    }
+
+    .subtitle {
+      margin-top: 8px;
+      color: #cbd5e1;
+      max-width: 760px;
+      line-height: 1.55;
+      font-size: 1.05rem;
+    }
+
+    .panel {
+      background: rgba(248, 250, 252, 0.96);
+      color: var(--text);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 26px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 22px;
+      align-items: stretch;
+      margin-bottom: 24px;
+    }
+
+    .rules { display: grid; gap: 12px; }
+
+    .rule {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 12px;
+      align-items: start;
+      padding: 14px;
+      border-radius: 18px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+    }
+
+    .rule-number {
+      width: 30px;
+      height: 30px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: var(--accent);
+      color: white;
+      font-weight: 800;
+    }
+
+    .stats-card {
+      background: rgba(15, 23, 42, 0.96);
+      color: var(--text-light);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 100%;
+    }
+
+    .big-stat {
+      font-size: 3.5rem;
+      font-weight: 900;
+      letter-spacing: -0.06em;
+    }
+
+    .muted { color: var(--muted); }
+    .muted-light { color: #cbd5e1; }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .btn {
+      padding: 12px 18px;
+      border-radius: 999px;
+      font-weight: 800;
+      background: var(--accent);
+      color: white;
+      transition: transform 0.15s ease, background 0.15s ease, opacity 0.15s ease;
+    }
+
+    .btn:hover { transform: translateY(-1px); background: var(--accent-dark); }
+    .btn.secondary { background: #e2e8f0; color: #0f172a; }
+    .btn.secondary:hover { background: #cbd5e1; }
+    .btn.danger { background: #fee2e2; color: #991b1b; }
+    .btn.danger:hover { background: #fecaca; }
+    .btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+    .code-panel {
+      margin-top: 22px;
+      padding: 18px;
+      border-radius: 20px;
+      background: rgba(248, 250, 252, 0.08);
+      border: 1px solid rgba(226, 232, 240, 0.2);
+    }
+
+    .code-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .code-output, .code-input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid #cbd5e1;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      background: white;
+      color: #0f172a;
+      min-width: 0;
+    }
+
+    .code-output {
+      font-size: 0.85rem;
+    }
+
+    .code-message {
+      min-height: 22px;
+      margin-top: 10px;
+      color: #cbd5e1;
+      line-height: 1.45;
+      font-size: 0.95rem;
+    }
+
+    .code-message.good { color: #86efac; }
+    .code-message.bad { color: #fca5a5; }
+
+    .section-title {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 26px 0 14px;
+    }
+
+    .section-title h2 {
+      font-size: 1.6rem;
+      letter-spacing: -0.03em;
+    }
+
+    .blocks-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .block-card {
+      text-align: left;
+      color: var(--text);
+      background: rgba(248, 250, 252, 0.97);
+      border-radius: 22px;
+      padding: 18px;
+      min-height: 190px;
+      box-shadow: 0 14px 35px rgba(0, 0, 0, 0.22);
+      border: 2px solid transparent;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+      transition: transform 0.15s ease, border-color 0.15s ease;
+    }
+
+    .block-card:hover { border-color: #93c5fd; transform: translateY(-2px); }
+    .block-card.locked { background: rgba(226, 232, 240, 0.92); color: var(--locked); cursor: not-allowed; }
+
+    .block-kicker {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-weight: 900;
+      color: var(--accent);
+    }
+
+    .block-card.locked .block-kicker { color: var(--locked); }
+
+    .block-title {
+      font-size: 1.15rem;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      margin-top: 4px;
+    }
+
+    .progress-bar {
+      height: 10px;
+      border-radius: 999px;
+      background: #cbd5e1;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, #60a5fa, #2563eb);
+      border-radius: 999px;
+    }
+
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    .level-layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .level-list { display: grid; gap: 10px; }
+
+    .level-btn {
+      width: 100%;
+      text-align: left;
+      padding: 12px 14px;
+      border-radius: 15px;
+      background: #f8fafc;
+      color: var(--text);
+      border: 1px solid #cbd5e1;
+      font-weight: 800;
+    }
+
+    .level-btn.done { border-color: #86efac; background: #dcfce7; }
+    .level-btn.current { border-color: #60a5fa; background: #dbeafe; }
+
+    .case-card {
+      background: #f8fafc;
+      color: var(--text);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .case-header {
+      padding: 22px 24px;
+      background: #0f172a;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .case-body { padding: 24px; }
+
+    .case-text {
+      font-size: clamp(1.3rem, 3vw, 2rem);
+      line-height: 1.3;
+      letter-spacing: -0.03em;
+      font-weight: 800;
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      border-radius: 18px;
+      padding: 22px;
+      margin: 16px 0 18px;
+    }
+
+    .instruction {
+      color: var(--muted);
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+
+    .options {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin: 18px 0;
+    }
+
+    .option {
+      padding: 16px;
+      border-radius: 18px;
+      background: #e2e8f0;
+      color: var(--text);
+      text-align: left;
+      font-weight: 800;
+      border: 2px solid transparent;
+    }
+
+    .option:hover { border-color: #93c5fd; background: #dbeafe; }
+    .option.selected { border-color: var(--accent); background: #bfdbfe; }
+    .option.correct { border-color: var(--good); background: #dcfce7; }
+    .option.incorrect { border-color: var(--bad); background: #fee2e2; }
+
+    .select-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .select-like {
+      padding: 13px 14px;
+      border-radius: 15px;
+      border: 1px solid #cbd5e1;
+      background: white;
+      color: var(--text);
+      width: 100%;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 90px;
+      resize: vertical;
+      border-radius: 15px;
+      border: 1px solid #cbd5e1;
+      padding: 14px;
+      margin-top: 12px;
+      color: var(--text);
+    }
+
+    .feedback {
+      display: none;
+      margin-top: 18px;
+      padding: 18px;
+      border-radius: 18px;
+      line-height: 1.55;
+    }
+
+    .feedback.show { display: block; }
+    .feedback.good { background: #dcfce7; color: #14532d; border: 1px solid #86efac; }
+    .feedback.bad { background: #fee2e2; color: #7f1d1d; border: 1px solid #fecaca; }
+
+    .hint-box {
+      display: none;
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 16px;
+      background: #fef3c7;
+      color: #78350f;
+      border: 1px solid #fde68a;
+      line-height: 1.5;
+    }
+
+    .hint-box.show { display: block; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: #e0f2fe;
+      color: #075985;
+      font-weight: 900;
+      font-size: 0.85rem;
+      white-space: nowrap;
+    }
+
+    .footer-note {
+      margin-top: 26px;
+      color: #cbd5e1;
+      text-align: center;
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 920px) {
+      .hero, .level-layout { grid-template-columns: 1fr; }
+      .blocks-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 620px) {
+      .blocks-grid, .options, .select-row, .code-row { grid-template-columns: 1fr; }
+      .topbar { align-items: start; flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">⌕</div>
+        <div>
+          <h1>Detectives del Error</h1>
+          <p class="subtitle">Lee despacio, localiza la trampa, clasifica el error y explica tu razonamiento. No se trata de contestar rápido: se trata de comprobar mejor.</p>
+        </div>
+      </div>
+      <button class="btn secondary" id="homeBtn">Inicio</button>
+    </header>
+
+    <section id="homeScreen" class="screen active">
+      <div class="hero">
+        <div class="panel">
+          <h2>Antes de investigar</h2>
+          <div class="rules" style="margin-top:16px">
+            <div class="rule">
+              <div class="rule-number">1</div>
+              <div><strong>Lee literal.</strong><br><span class="muted">No inventes datos. Mira exactamente qué dice el caso.</span></div>
+            </div>
+            <div class="rule">
+              <div class="rule-number">2</div>
+              <div><strong>Descarta.</strong><br><span class="muted">Comprueba qué opciones no pueden ser correctas.</span></div>
+            </div>
+            <div class="rule">
+              <div class="rule-number">3</div>
+              <div><strong>Comprueba.</strong><br><span class="muted">Explica por qué hay error o por qué no lo hay.</span></div>
+            </div>
+          </div>
+        </div>
+
+        <aside class="stats-card">
+          <div>
+            <p class="muted-light">Progreso total</p>
+            <div class="big-stat"><span id="totalDone">0</span>/<span id="totalLevels">0</span></div>
+            <p class="muted-light">niveles resueltos</p>
+          </div>
+
+          <div class="actions">
+            <button class="btn" id="continueBtn">Continuar</button>
+            <button class="btn danger" id="resetBtn">Reiniciar progreso</button>
+          </div>
+
+          <div class="code-panel">
+            <h3>Código de continuidad</h3>
+            <p class="muted-light" style="margin-top:6px; line-height:1.45">Guarda este código corto al final de la sesión. Ejemplo: DE-3F-24.</p>
+            <div class="code-row">
+              <input class="code-output" id="progressCodeOutput" readonly value="" aria-label="Código de progreso" />
+              <button class="btn secondary" id="copyCodeBtn">Copiar</button>
+            </div>
+            <div class="code-row">
+              <input class="code-input" id="progressCodeInput" placeholder="Ejemplo: DE-3F-24" aria-label="Introducir código de progreso" />
+              <button class="btn" id="loadCodeBtn">Cargar</button>
+            </div>
+            <p class="code-message" id="codeMessage"></p>
+          </div>
+        </aside>
+      </div>
+
+      <div class="section-title">
+        <h2>Bloques de investigación</h2>
+        <span class="badge">8 bloques · 64 niveles</span>
+      </div>
+      <div class="blocks-grid" id="blocksGrid"></div>
+    </section>
+
+    <section id="blockScreen" class="screen">
+      <div class="section-title">
+        <div>
+          <h2 id="blockTitle">Bloque</h2>
+          <p class="muted-light" id="blockDescription"></p>
+        </div>
+        <button class="btn secondary" id="backToBlocksBtn">Volver a bloques</button>
+      </div>
+
+      <div class="level-layout">
+        <aside class="panel">
+          <h3>Niveles</h3>
+          <p class="muted" style="margin:8px 0 16px">Completa al menos 6 niveles para desbloquear el siguiente bloque.</p>
+          <div class="level-list" id="levelList"></div>
+        </aside>
+
+        <article class="case-card">
+          <div class="case-header">
+            <div>
+              <p class="muted-light" id="caseKicker">Nivel</p>
+              <h2 id="caseTitle">Título del caso</h2>
+            </div>
+            <span class="badge" id="caseType">Tipo</span>
+          </div>
+          <div class="case-body">
+            <p class="instruction" id="caseInstruction">Encuentra el error.</p>
+            <div class="case-text" id="caseText"></div>
+
+            <p><strong>1. ¿Dónde está el error?</strong></p>
+            <div class="options" id="options"></div>
+
+            <div class="select-row">
+              <label>
+                <strong>2. Clasifica el error</strong>
+                <select class="select-like" id="typeSelect">
+                  <option value="">Elige una categoría</option>
+                  <option value="calculo">Cálculo</option>
+                  <option value="unidades">Unidades o medida</option>
+                  <option value="lengua">Lengua</option>
+                  <option value="logica">Lógica</option>
+                  <option value="instrucciones">Instrucciones o algoritmo</option>
+                  <option value="ciencias">Ciencias o conocimiento</option>
+                  <option value="informacion">Información insuficiente</option>
+                  <option value="sin_error">No hay error</option>
+                </select>
+              </label>
+              <label>
+                <strong>Ayuda</strong><br>
+                <button class="btn secondary" id="hintBtn" style="margin-top:10px">Ver pista</button>
+              </label>
+            </div>
+
+            <div class="hint-box" id="hintBox"></div>
+
+            <label>
+              <strong>3. Explica tu razonamiento</strong>
+              <textarea id="explanationInput" placeholder="Escribe una explicación breve. Ejemplo: El resultado no puede ser ese porque..."></textarea>
+            </label>
+
+            <div class="actions">
+              <button class="btn" id="checkBtn">Comprobar</button>
+              <button class="btn secondary" id="nextBtn" disabled>Siguiente nivel</button>
+            </div>
+
+            <div class="feedback" id="feedbackBox"></div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <p class="footer-note">Proyecto educativo en desarrollo · Pensamiento crítico, revisión y detección de inconsistencias</p>
+  </main>
+
+  <script>
+    const STORAGE_KEY = "detectivesDelErrorProgress_v2";
+
+    const blocks = [
+      {
+        id: "b1",
+        title: "Errores evidentes",
+        description: "Casos sencillos para entrar en modo detective.",
+        levels: [
+          { title: "Tabla sospechosa", text: "7 × 8 = 54", instruction: "Localiza el error de cálculo.", type: "calculo", answerIndex: 1, options: ["El 7", "El resultado 54", "El signo ×", "No hay error"], hint: "Recuerda la tabla del 8.", explanation: "7 × 8 no es 54, sino 56. El error está en el resultado." },
+          { title: "Frase torcida", text: "Los niño juegan en el patio.", instruction: "Encuentra el problema de concordancia.", type: "lengua", answerIndex: 0, options: ["Los niño", "juegan", "en el patio", "No hay error"], hint: "Mira si artículo y nombre coinciden en número.", explanation: "Debe decir «Los niños juegan...» porque el artículo está en plural." },
+          { title: "Animal imposible", text: "El pez salió volando del acuario y se posó en un árbol.", instruction: "Detecta el dato imposible.", type: "ciencias", answerIndex: 1, options: ["El pez", "salió volando", "del acuario", "un árbol"], hint: "Piensa qué puede hacer normalmente un pez.", explanation: "Un pez no puede salir volando y posarse en un árbol. Es un dato imposible en una situación normal." },
+          { title: "Suma distraída", text: "125 + 40 = 145", instruction: "Comprueba la operación.", type: "calculo", answerIndex: 2, options: ["125", "+", "145", "No hay error"], hint: "Suma primero 100 + 40.", explanation: "125 + 40 = 165. El resultado 145 es incorrecto." },
+          { title: "Día raro", text: "Ayer fue lunes y mañana también será lunes.", instruction: "Busca la contradicción temporal.", type: "logica", answerIndex: 1, options: ["Ayer fue lunes", "mañana también será lunes", "La palabra ayer", "No hay error"], hint: "Entre ayer y mañana pasan dos días.", explanation: "Si ayer fue lunes, hoy es martes y mañana será miércoles. No puede ser lunes otra vez." },
+          { title: "Orden imposible", text: "Para lavarte las manos: primero sécalas, después mójalas y al final ponte jabón.", instruction: "Detecta el problema en las instrucciones.", type: "instrucciones", answerIndex: 0, options: ["primero sécalas", "después mójalas", "ponte jabón", "No hay error"], hint: "Piensa qué paso debe ir al final.", explanation: "No tiene sentido secarse las manos antes de mojarlas y enjabonarlas. El orden está mal." },
+          { title: "Capital confundida", text: "La capital de Francia es Roma.", instruction: "Localiza el dato incorrecto.", type: "ciencias", answerIndex: 2, options: ["capital", "Francia", "Roma", "No hay error"], hint: "Roma es capital de otro país.", explanation: "La capital de Francia es París. Roma es la capital de Italia." },
+          { title: "Reto final del bloque", text: "Si tengo 10 caramelos y regalo 3, ahora tengo 13.", instruction: "Encuentra el error y explica la operación correcta.", type: "calculo", answerIndex: 2, options: ["tengo 10", "regalo 3", "ahora tengo 13", "No hay error"], hint: "Regalar reduce la cantidad.", explanation: "Si regalo 3 caramelos, no sumo: resto. 10 − 3 = 7." }
+        ]
+      },
+      {
+        id: "b2",
+        title: "Errores matemáticos",
+        description: "Decimales, unidades, problemas y operaciones con trampa.",
+        levels: [
+          { title: "Kilómetros encogidos", text: "3,5 km = 350 m", instruction: "Revisa la conversión de unidades.", type: "unidades", answerIndex: 1, options: ["3,5 km", "350 m", "El signo =", "No hay error"], hint: "1 km son 1000 m.", explanation: "3,5 km equivalen a 3500 m, no a 350 m." },
+          { title: "Perímetro disfrazado", text: "Un cuadrado de lado 5 cm tiene un área de 20 cm².", instruction: "Distingue área y perímetro.", type: "calculo", answerIndex: 2, options: ["cuadrado", "lado 5 cm", "área de 20 cm²", "No hay error"], hint: "El área del cuadrado es lado × lado.", explanation: "20 cm sería el perímetro. El área es 5 × 5 = 25 cm²." },
+          { title: "Coma viajera", text: "456 cm = 45,6 m", instruction: "Comprueba el cambio de centímetros a metros.", type: "unidades", answerIndex: 1, options: ["456 cm", "45,6 m", "El signo =", "No hay error"], hint: "100 cm son 1 m.", explanation: "456 cm son 4,56 m. Se ha movido mal la coma." },
+          { title: "Precio imposible", text: "Compro 3 libretas de 2 € cada una. Pago 5 € en total.", instruction: "Comprueba si el total corresponde al precio unitario.", type: "calculo", answerIndex: 2, options: ["3 libretas", "2 € cada una", "Pago 5 €", "No hay error"], hint: "Multiplica cantidad por precio.", explanation: "3 libretas de 2 € cuestan 6 €. El total de 5 € es incorrecto." },
+          { title: "Dato innecesario", text: "Lucía tiene 12 años, compra 4 lápices a 1 € cada uno y paga 4 €.", instruction: "¿Hay error o solo un dato que no hace falta?", type: "sin_error", answerIndex: 3, options: ["12 años", "4 lápices", "1 € cada uno", "No hay error"], hint: "Que un dato no haga falta no significa que sea falso.", explanation: "No hay error matemático. La edad es un dato innecesario, pero no contradice el problema." },
+          { title: "Mitad mal pensada", text: "La mitad de 90 es 40.", instruction: "Comprueba la mitad.", type: "calculo", answerIndex: 1, options: ["La mitad", "40", "90", "No hay error"], hint: "Busca dos números iguales que sumen 90.", explanation: "La mitad de 90 es 45, porque 45 + 45 = 90." },
+          { title: "Resultado correcto, explicación mala", text: "25 × 4 = 100 porque 25 + 4 = 100.", instruction: "El resultado es correcto, pero revisa el razonamiento.", type: "logica", answerIndex: 2, options: ["25 × 4", "100", "porque 25 + 4 = 100", "No hay error"], hint: "Una respuesta puede estar bien por una razón equivocada.", explanation: "25 × 4 sí es 100, pero 25 + 4 no es 100. La explicación es falsa." },
+          { title: "Reto final matemático", text: "Un rectángulo mide 8 cm de largo y 3 cm de ancho. Su perímetro es 24 cm².", instruction: "Hay un error sutil: localízalo.", type: "unidades", answerIndex: 2, options: ["8 cm de largo", "3 cm de ancho", "24 cm²", "No hay error"], hint: "El perímetro no se mide en unidades cuadradas.", explanation: "El perímetro sería 22 cm, y además se mide en cm, no en cm²." }
+        ]
+      },
+      { id: "b3", title: "Errores de lengua", description: "Concordancia, puntuación, tiempos verbales y sentido de las frases.", levels: [] },
+      { id: "b4", title: "Errores de lógica", description: "Conclusiones falsas, contradicciones y razonamientos incompletos.", levels: [] },
+      { id: "b5", title: "Instrucciones y algoritmos", description: "Pasos desordenados, condiciones incorrectas y órdenes ambiguas.", levels: [] },
+      { id: "b6", title: "Ciencias y sociedad", description: "Afirmaciones falsas, causalidades dudosas y conocimiento general.", levels: [] },
+      { id: "b7", title: "Errores escondidos", description: "Casos donde el fallo no está donde parece.", levels: [] },
+      { id: "b8", title: "Casi fake news", description: "Titulares engañosos, exageraciones y conclusiones sin pruebas.", levels: [] }
+    ];
+
+    blocks.forEach(function(block) {
+      if (block.levels.length === 0) {
+        block.levels = Array.from({ length: 8 }, function(_, i) {
+          return {
+            title: "Caso " + (i + 1),
+            text: "Nivel en construcción del bloque «" + block.title + "».",
+            instruction: "Este nivel está preparado para añadir contenido real.",
+            type: "informacion",
+            answerIndex: 3,
+            options: ["Error en el dato", "Error en la operación", "Error en la conclusión", "Nivel en construcción"],
+            hint: "Más adelante sustituiremos este caso por un reto real.",
+            explanation: "Este es un nivel provisional para mantener la estructura completa de la app."
+          };
+        });
+      }
+    });
+
+    let progress = loadProgress();
+    let currentBlockIndex = 0;
+    let currentLevelIndex = 0;
+    let selectedOption = null;
+
+    const homeScreen = document.getElementById("homeScreen");
+    const blockScreen = document.getElementById("blockScreen");
+    const blocksGrid = document.getElementById("blocksGrid");
+    const totalDone = document.getElementById("totalDone");
+    const totalLevels = document.getElementById("totalLevels");
+    const blockTitle = document.getElementById("blockTitle");
+    const blockDescription = document.getElementById("blockDescription");
+    const levelList = document.getElementById("levelList");
+    const caseKicker = document.getElementById("caseKicker");
+    const caseTitle = document.getElementById("caseTitle");
+    const caseType = document.getElementById("caseType");
+    const caseInstruction = document.getElementById("caseInstruction");
+    const caseText = document.getElementById("caseText");
+    const optionsContainer = document.getElementById("options");
+    const typeSelect = document.getElementById("typeSelect");
+    const explanationInput = document.getElementById("explanationInput");
+    const feedbackBox = document.getElementById("feedbackBox");
+    const hintBox = document.getElementById("hintBox");
+    const checkBtn = document.getElementById("checkBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const progressCodeOutput = document.getElementById("progressCodeOutput");
+    const progressCodeInput = document.getElementById("progressCodeInput");
+    const codeMessage = document.getElementById("codeMessage");
+
+    document.getElementById("homeBtn").addEventListener("click", showHome);
+    document.getElementById("backToBlocksBtn").addEventListener("click", showHome);
+    document.getElementById("continueBtn").addEventListener("click", continueGame);
+    document.getElementById("resetBtn").addEventListener("click", resetProgress);
+    document.getElementById("copyCodeBtn").addEventListener("click", copyProgressCode);
+    document.getElementById("loadCodeBtn").addEventListener("click", loadProgressFromCode);
+    document.getElementById("hintBtn").addEventListener("click", showHint);
+    checkBtn.addEventListener("click", checkAnswer);
+    nextBtn.addEventListener("click", goNextLevel);
+
+    renderHome();
+
+    function loadProgress() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (!saved) return { completed: {}, lastBlock: 0, lastLevel: 0 };
+      try {
+        const parsed = JSON.parse(saved);
+        if (!parsed.completed) parsed.completed = {};
+        if (!Number.isInteger(parsed.lastBlock)) parsed.lastBlock = 0;
+        if (!Number.isInteger(parsed.lastLevel)) parsed.lastLevel = 0;
+        return parsed;
+      } catch (error) {
+        return { completed: {}, lastBlock: 0, lastLevel: 0 };
+      }
+    }
+
+    function saveProgress() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+      updateProgressCode();
+    }
+
+    function updateProgressCode() {
+      if (progressCodeOutput) progressCodeOutput.value = generateProgressCode();
+    }
+
+    function generateProgressCode() {
+      let codeNumber = 0n;
+
+      blocks.forEach(function(block, blockIndex) {
+        block.levels.forEach(function(_, levelIndex) {
+          if (isLevelDone(blockIndex, levelIndex)) {
+            const bitPosition = BigInt(blockIndex * 8 + levelIndex);
+            codeNumber = codeNumber | (1n << bitPosition);
+          }
+        });
+      });
+
+      const progressPart = bigIntToBase36(codeNumber);
+      const lastBlock = (progress.lastBlock || 0) + 1;
+      const lastLevel = (progress.lastLevel || 0) + 1;
+      return "DE-" + progressPart + "-" + lastBlock + lastLevel;
+    }
+
+    function decodeProgressCode(code) {
+      const cleaned = String(code || "").trim().toUpperCase().split(" ").join("");
+      const parts = cleaned.split("-");
+      if (parts.length !== 3 || parts[0] !== "DE") throw new Error("Formato no válido");
+
+      const progressPart = parts[1];
+      const positionPart = parts[2];
+      if (!progressPart || positionPart.length !== 2) throw new Error("Código no válido");
+
+      let codeNumber = base36ToBigInt(progressPart);
+      const completed = {};
+
+      for (let blockIndex = 0; blockIndex < blocks.length; blockIndex++) {
+        for (let levelIndex = 0; levelIndex < blocks[blockIndex].levels.length; levelIndex++) {
+          const bitPosition = BigInt(blockIndex * 8 + levelIndex);
+          const isDone = (codeNumber & (1n << bitPosition)) !== 0n;
+          if (isDone) completed[getLevelKey(blockIndex, levelIndex)] = true;
+        }
+      }
+
+      const lastBlock = clampNumber(Number(positionPart.charAt(0)) - 1, 0, blocks.length - 1);
+      const lastLevel = clampNumber(Number(positionPart.charAt(1)) - 1, 0, 7);
+
+      return {
+        completed: completed,
+        lastBlock: lastBlock,
+        lastLevel: lastLevel
+      };
+    }
+
+    function bigIntToBase36(number) {
+      const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      if (number === 0n) return "0";
+      let result = "";
+      let value = number;
+      while (value > 0n) {
+        const remainder = Number(value % 36n);
+        result = chars[remainder] + result;
+        value = value / 36n;
+      }
+      return result;
+    }
+
+    function base36ToBigInt(text) {
+      const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      let result = 0n;
+      for (let i = 0; i < text.length; i++) {
+        const value = chars.indexOf(text.charAt(i));
+        if (value < 0) throw new Error("Carácter no válido");
+        result = result * 36n + BigInt(value);
+      }
+      return result;
+    }
+
+    function clampNumber(value, min, max) {
+      return Number.isInteger(value) ? Math.max(min, Math.min(value, max)) : min;
+    }
+
+    function copyProgressCode() {
+      const code = generateProgressCode();
+      progressCodeOutput.value = code;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).then(function() {
+          showCodeMessage("Código copiado. Guárdalo para la próxima sesión.", "good");
+        }).catch(function() {
+          progressCodeOutput.select();
+          showCodeMessage("No se pudo copiar automáticamente. Selecciona el código y cópialo manualmente.", "bad");
+        });
+      } else {
+        progressCodeOutput.select();
+        showCodeMessage("Selecciona el código y cópialo manualmente.", "bad");
+      }
+    }
+
+    function loadProgressFromCode() {
+      try {
+        const imported = decodeProgressCode(progressCodeInput.value);
+        progress = imported;
+        saveProgress();
+        renderHome();
+        showCodeMessage("Progreso cargado correctamente.", "good");
+      } catch (error) {
+        showCodeMessage("El código no se reconoce. Revisa que esté completo y sin espacios extraños.", "bad");
+      }
+    }
+
+    function showCodeMessage(message, type) {
+      codeMessage.textContent = message;
+      codeMessage.className = "code-message " + (type || "");
+    }
+
+    function getLevelKey(blockIndex, levelIndex) {
+      return blocks[blockIndex].id + "_" + levelIndex;
+    }
+
+    function isLevelDone(blockIndex, levelIndex) {
+      return Boolean(progress.completed[getLevelKey(blockIndex, levelIndex)]);
+    }
+
+    function countDoneInBlock(blockIndex) {
+      return blocks[blockIndex].levels.filter(function(_, i) {
+        return isLevelDone(blockIndex, i);
+      }).length;
+    }
+
+    function isBlockUnlocked(blockIndex) {
+      if (blockIndex === 0) return true;
+      return countDoneInBlock(blockIndex - 1) >= 6;
+    }
+
+    function totalCompleted() {
+      return Object.values(progress.completed).filter(Boolean).length;
+    }
+
+    function totalLevelCount() {
+      return blocks.reduce(function(sum, block) {
+        return sum + block.levels.length;
+      }, 0);
+    }
+
+    function renderHome() {
+      totalDone.textContent = totalCompleted();
+      totalLevels.textContent = totalLevelCount();
+      updateProgressCode();
+      blocksGrid.innerHTML = "";
+
+      blocks.forEach(function(block, index) {
+        const unlocked = isBlockUnlocked(index);
+        const done = countDoneInBlock(index);
+        const total = block.levels.length;
+        const card = document.createElement("button");
+        card.className = "block-card " + (unlocked ? "" : "locked");
+        card.disabled = !unlocked;
+        card.innerHTML = "<div>" +
+          "<div class='block-kicker'>Bloque " + (index + 1) + "</div>" +
+          "<div class='block-title'>" + block.title + "</div>" +
+          "<p class='muted' style='margin-top:8px; line-height:1.4'>" + block.description + "</p>" +
+          "</div>" +
+          "<div>" +
+          "<p class='muted' style='margin-bottom:8px'>" + (unlocked ? done + "/" + total + " niveles" : "Bloque bloqueado") + "</p>" +
+          "<div class='progress-bar'><div class='progress-fill' style='width:" + ((done / total) * 100) + "%'></div></div>" +
+          "</div>";
+        card.addEventListener("click", function() { openBlock(index); });
+        blocksGrid.appendChild(card);
+      });
+    }
+
+    function showHome() {
+      homeScreen.classList.add("active");
+      blockScreen.classList.remove("active");
+      renderHome();
+    }
+
+    function openBlock(blockIndex, levelIndex) {
+      if (!isBlockUnlocked(blockIndex)) return;
+      currentBlockIndex = blockIndex;
+      currentLevelIndex = Number.isInteger(levelIndex) ? levelIndex : 0;
+      progress.lastBlock = blockIndex;
+      progress.lastLevel = currentLevelIndex;
+      saveProgress();
+      homeScreen.classList.remove("active");
+      blockScreen.classList.add("active");
+      renderBlock();
+      renderLevel();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function continueGame() {
+      const blockIndex = Math.min(progress.lastBlock || 0, blocks.length - 1);
+      const levelIndex = Math.min(progress.lastLevel || 0, blocks[blockIndex].levels.length - 1);
+      if (isBlockUnlocked(blockIndex)) openBlock(blockIndex, levelIndex);
+      else openBlock(0, 0);
+    }
+
+    function renderBlock() {
+      const block = blocks[currentBlockIndex];
+      blockTitle.textContent = "Bloque " + (currentBlockIndex + 1) + ": " + block.title;
+      blockDescription.textContent = block.description;
+      levelList.innerHTML = "";
+
+      block.levels.forEach(function(level, index) {
+        const btn = document.createElement("button");
+        btn.className = "level-btn " + (isLevelDone(currentBlockIndex, index) ? "done " : "") + (index === currentLevelIndex ? "current" : "");
+        btn.textContent = (isLevelDone(currentBlockIndex, index) ? "✓" : "○") + " Nivel " + (index + 1) + ": " + level.title;
+        btn.addEventListener("click", function() {
+          currentLevelIndex = index;
+          progress.lastBlock = currentBlockIndex;
+          progress.lastLevel = currentLevelIndex;
+          saveProgress();
+          renderBlock();
+          renderLevel();
+        });
+        levelList.appendChild(btn);
+      });
+    }
+
+    function renderLevel() {
+      const level = blocks[currentBlockIndex].levels[currentLevelIndex];
+      selectedOption = null;
+      caseKicker.textContent = "Bloque " + (currentBlockIndex + 1) + " · Nivel " + (currentLevelIndex + 1);
+      caseTitle.textContent = level.title;
+      caseType.textContent = readableType(level.type);
+      caseInstruction.textContent = level.instruction;
+      caseText.textContent = level.text;
+      typeSelect.value = "";
+      explanationInput.value = "";
+      feedbackBox.className = "feedback";
+      feedbackBox.innerHTML = "";
+      hintBox.className = "hint-box";
+      hintBox.textContent = level.hint;
+      nextBtn.disabled = true;
+
+      optionsContainer.innerHTML = "";
+      level.options.forEach(function(option, index) {
+        const btn = document.createElement("button");
+        btn.className = "option";
+        btn.textContent = option;
+        btn.addEventListener("click", function() { selectOption(index); });
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    function selectOption(index) {
+      selectedOption = index;
+      Array.from(optionsContainer.children).forEach(function(btn, i) {
+        btn.classList.toggle("selected", i === index);
+      });
+    }
+
+    function showHint() {
+      hintBox.classList.add("show");
+    }
+
+    function checkAnswer() {
+      const level = blocks[currentBlockIndex].levels[currentLevelIndex];
+      const typeIsCorrect = typeSelect.value === level.type;
+      const optionIsCorrect = selectedOption === level.answerIndex;
+      const explanation = explanationInput.value.trim();
+      const hasExplanation = explanation.length >= 12;
+      const isCorrect = optionIsCorrect && typeIsCorrect && hasExplanation;
+
+      Array.from(optionsContainer.children).forEach(function(btn, i) {
+        btn.classList.remove("correct", "incorrect");
+        if (i === level.answerIndex) btn.classList.add("correct");
+        if (selectedOption === i && i !== level.answerIndex) btn.classList.add("incorrect");
+      });
+
+      if (isCorrect) {
+        progress.completed[getLevelKey(currentBlockIndex, currentLevelIndex)] = true;
+        progress.lastBlock = currentBlockIndex;
+        progress.lastLevel = currentLevelIndex;
+        saveProgress();
+        feedbackBox.className = "feedback good show";
+        feedbackBox.innerHTML = "<strong>Buen trabajo.</strong><br>" + level.explanation;
+        nextBtn.disabled = false;
+        renderBlock();
+      } else {
+        const missing = [];
+        if (!optionIsCorrect) missing.push("no has localizado bien el error");
+        if (!typeIsCorrect) missing.push("la categoría no encaja");
+        if (!hasExplanation) missing.push("falta una explicación un poco más completa");
+        feedbackBox.className = "feedback bad show";
+        feedbackBox.innerHTML = "<strong>Revisa antes de cerrar el caso.</strong><br>Problema detectado: " + missing.join(", ") + ".<br><br><strong>Pista de corrección:</strong> " + level.explanation;
+        nextBtn.disabled = false;
+      }
+    }
+
+    function goNextLevel() {
+      const block = blocks[currentBlockIndex];
+      if (currentLevelIndex < block.levels.length - 1) {
+        currentLevelIndex += 1;
+        progress.lastLevel = currentLevelIndex;
+        saveProgress();
+        renderBlock();
+        renderLevel();
+      } else if (currentBlockIndex < blocks.length - 1 && isBlockUnlocked(currentBlockIndex + 1)) {
+        openBlock(currentBlockIndex + 1, 0);
+      } else {
+        showHome();
+      }
+    }
+
+    function resetProgress() {
+      const sure = confirm("¿Seguro que quieres borrar el progreso guardado en este navegador?");
+      if (!sure) return;
+      progress = { completed: {}, lastBlock: 0, lastLevel: 0 };
+      saveProgress();
+      renderHome();
+      showCodeMessage("Progreso reiniciado.", "bad");
+    }
+
+    function readableType(type) {
+      const labels = {
+        calculo: "Cálculo",
+        unidades: "Unidades",
+        lengua: "Lengua",
+        logica: "Lógica",
+        instrucciones: "Instrucciones",
+        ciencias: "Ciencias",
+        informacion: "Información",
+        sin_error: "Sin error"
+      };
+      return labels[type] || "Caso";
+    }
+  </script>
+</body>
+</html>
