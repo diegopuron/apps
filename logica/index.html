@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Detectives Lógicos</title>
+  <style>
+    :root {
+      --bg: #f6f8fc;
+      --bg-2: #eef3ff;
+      --card: #ffffff;
+      --text: #172033;
+      --muted: #64748b;
+      --primary: #4f46e5;
+      --primary-dark: #3730a3;
+      --accent: #06b6d4;
+      --success: #16a34a;
+      --danger: #dc2626;
+      --warning: #f59e0b;
+      --border: #dbe3f0;
+      --shadow: 0 18px 45px rgba(30, 41, 59, 0.12);
+      --radius: 24px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(79, 70, 229, 0.16), transparent 32rem),
+        radial-gradient(circle at top right, rgba(6, 182, 212, 0.16), transparent 30rem),
+        linear-gradient(135deg, var(--bg), var(--bg-2));
+    }
+
+    .app-shell {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 48px;
+    }
+
+    header.hero {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 24px;
+      align-items: stretch;
+      margin-bottom: 24px;
+    }
+
+    .hero-main,
+    .progress-card,
+    .panel,
+    .level-card,
+    .logic-card {
+      background: rgba(255, 255, 255, 0.86);
+      border: 1px solid rgba(219, 227, 240, 0.9);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+    }
+
+    .hero-main {
+      padding: 30px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-main::after {
+      content: "";
+      position: absolute;
+      width: 220px;
+      height: 220px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(79, 70, 229, 0.18), rgba(6, 182, 212, 0.12));
+      right: -70px;
+      top: -80px;
+    }
+
+    .kicker {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(79, 70, 229, 0.1);
+      color: var(--primary-dark);
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    h1 {
+      margin: 18px 0 10px;
+      font-size: clamp(2rem, 4vw, 4rem);
+      line-height: 1;
+      letter-spacing: -0.06em;
+    }
+
+    .hero-main p {
+      max-width: 760px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 1.08rem;
+      line-height: 1.6;
+    }
+
+    .progress-card {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .progress-card h2,
+    .panel h2,
+    .logic-card h2 {
+      margin: 0;
+      font-size: 1.2rem;
+      letter-spacing: -0.02em;
+    }
+
+    .progress-bar {
+      height: 12px;
+      background: #e5e7eb;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 12.5%;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      border-radius: 999px;
+      transition: width 0.25s ease;
+    }
+
+    .code-box {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 12px 14px;
+      font: inherit;
+      outline: none;
+      background: #fff;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.12);
+    }
+
+    button {
+      border: 0;
+      border-radius: 16px;
+      padding: 12px 16px;
+      font: inherit;
+      font-weight: 750;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+    button:active { transform: translateY(0); }
+
+    .btn-primary {
+      color: #fff;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      box-shadow: 0 12px 24px rgba(79, 70, 229, 0.24);
+    }
+
+    .btn-ghost {
+      color: var(--primary-dark);
+      background: rgba(79, 70, 229, 0.1);
+    }
+
+    .btn-danger-soft {
+      color: var(--danger);
+      background: rgba(220, 38, 38, 0.09);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .panel { padding: 20px; }
+
+    .levels {
+      display: grid;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .level-card {
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: none;
+      cursor: pointer;
+      transition: transform 0.15s ease, border 0.15s ease, background 0.15s ease;
+    }
+
+    .level-card:hover { transform: translateY(-1px); }
+
+    .level-card.active {
+      border-color: rgba(79, 70, 229, 0.45);
+      background: rgba(79, 70, 229, 0.07);
+    }
+
+    .level-card.locked {
+      opacity: 0.52;
+      cursor: not-allowed;
+    }
+
+    .level-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      font-weight: 800;
+    }
+
+    .level-meta {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.35;
+    }
+
+    .logic-card { padding: 24px; }
+
+    .mission-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+      margin-bottom: 18px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 800;
+      background: rgba(6, 182, 212, 0.12);
+      color: #0e7490;
+      white-space: nowrap;
+    }
+
+    .situation {
+      color: var(--muted);
+      line-height: 1.55;
+      margin: 8px 0 0;
+    }
+
+    .clues {
+      display: grid;
+      gap: 10px;
+      margin: 20px 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .clues li {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      color: #334155;
+      line-height: 1.45;
+    }
+
+    .clue-number {
+      display: inline-grid;
+      place-items: center;
+      min-width: 26px;
+      height: 26px;
+      border-radius: 999px;
+      color: #fff;
+      background: var(--primary);
+      font-weight: 900;
+      font-size: 0.82rem;
+    }
+
+    .thinking-help {
+      margin: 18px 0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .hint-card {
+      padding: 14px;
+      border: 1px solid var(--border);
+      background: #fff;
+      border-radius: 18px;
+      color: var(--muted);
+      line-height: 1.4;
+      font-size: 0.92rem;
+    }
+
+    .hint-card strong {
+      display: block;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      background: #fff;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 520px;
+    }
+
+    th,
+    td {
+      padding: 12px;
+      border-bottom: 1px solid var(--border);
+      text-align: center;
+    }
+
+    th {
+      background: #f8fafc;
+      color: #334155;
+      font-size: 0.92rem;
+    }
+
+    th:first-child,
+    td:first-child {
+      text-align: left;
+      font-weight: 800;
+      color: var(--text);
+      position: sticky;
+      left: 0;
+      background: inherit;
+    }
+
+    tr:last-child td { border-bottom: 0; }
+
+    .cell-btn {
+      width: 42px;
+      height: 42px;
+      padding: 0;
+      border-radius: 14px;
+      background: #eef2ff;
+      color: #475569;
+      font-size: 1.1rem;
+      box-shadow: inset 0 0 0 1px rgba(79, 70, 229, 0.12);
+    }
+
+    .cell-btn.yes {
+      background: rgba(22, 163, 74, 0.12);
+      color: var(--success);
+    }
+
+    .cell-btn.no {
+      background: rgba(220, 38, 38, 0.11);
+      color: var(--danger);
+    }
+
+    .cell-btn.error {
+      outline: 3px solid rgba(220, 38, 38, 0.26);
+      animation: shake 0.18s linear 2;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      50% { transform: translateX(3px); }
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .feedback {
+      margin-top: 16px;
+      padding: 14px 16px;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      background: #f8fafc;
+      color: #334155;
+      line-height: 1.5;
+      min-height: 52px;
+    }
+
+    .feedback.success {
+      background: rgba(22, 163, 74, 0.1);
+      border-color: rgba(22, 163, 74, 0.28);
+      color: #166534;
+    }
+
+    .feedback.warning {
+      background: rgba(245, 158, 11, 0.1);
+      border-color: rgba(245, 158, 11, 0.3);
+      color: #92400e;
+    }
+
+    .feedback.danger {
+      background: rgba(220, 38, 38, 0.09);
+      border-color: rgba(220, 38, 38, 0.25);
+      color: #991b1b;
+    }
+
+    .checkpoint {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: #0f172a;
+      color: #fff;
+      display: none;
+      line-height: 1.4;
+    }
+
+    .checkpoint code {
+      color: #67e8f9;
+      font-weight: 900;
+      font-size: 1rem;
+    }
+
+    @media (max-width: 900px) {
+      header.hero,
+      .layout { grid-template-columns: 1fr; }
+      .thinking-help { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="hero">
+      <section class="hero-main">
+        <span class="kicker">🕵️ Pensamiento lógico · 5º y 6º</span>
+        <h1>Detectives Lógicos</h1>
+        <p>
+          Resuelve casos usando pistas, descartes e inferencias. Marca lo que es seguro,
+          lo que es imposible y lo que todavía está pendiente. La clave no es adivinar:
+          es justificar cada paso.
+        </p>
+      </section>
+
+      <aside class="progress-card" aria-label="Progreso">
+        <div>
+          <h2>Progreso de investigación</h2>
+          <p class="level-meta" id="progressText">Nivel 1 de 8 desbloqueado</p>
+        </div>
+        <div class="progress-bar" aria-hidden="true">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="code-box">
+          <input id="codeInput" type="text" placeholder="Introduce un código" autocomplete="off" />
+          <button class="btn-ghost" id="codeButton">Desbloquear</button>
+        </div>
+      </aside>
+    </header>
+
+    <main class="layout">
+      <aside class="panel">
+        <h2>Casos</h2>
+        <div class="levels" id="levelsList"></div>
+      </aside>
+
+      <section class="logic-card" id="gameArea" aria-live="polite"></section>
+    </main>
+  </div>
+
+  <script>
+    const CELL = {
+      unknown: "·",
+      yes: "✅",
+      no: "❌"
+    };
+
+    const unlockCodes = {
+      DETECTIVE: 1,
+      PISTAS: 3,
+      DEDUCCION: 5,
+      SHERLOCK: 8
+    };
+
+    const levels = [
+      {
+        id: 1,
+        title: "El recreo rápido",
+        type: "Una categoría",
+        checkpoint: "DETECTIVE",
+        situation: "Ana y Bruno han traído bocadillos distintos. Uno es de tortilla y otro es de queso.",
+        rows: ["Ana", "Bruno"],
+        cols: ["Tortilla", "Queso"],
+        clues: [
+          "Ana no ha traído el bocadillo de queso.",
+          "Cada persona tiene un único bocadillo y no se repiten."
+        ],
+        solution: {
+          Ana: { Tortilla: "yes", Queso: "no" },
+          Bruno: { Tortilla: "no", Queso: "yes" }
+        }
+      },
+      {
+        id: 2,
+        title: "Meriendas cruzadas",
+        type: "3 x 3",
+        checkpoint: null,
+        situation: "Ana, Bruno y Carla han traído meriendas distintas: fruta, yogur y bocadillo.",
+        rows: ["Ana", "Bruno", "Carla"],
+        cols: ["Fruta", "Yogur", "Bocadillo"],
+        clues: [
+          "Bruno no ha traído fruta.",
+          "Carla ha traído yogur.",
+          "Ana no ha traído bocadillo."
+        ],
+        solution: {
+          Ana: { Fruta: "yes", Yogur: "no", Bocadillo: "no" },
+          Bruno: { Fruta: "no", Yogur: "no", Bocadillo: "yes" },
+          Carla: { Fruta: "no", Yogur: "yes", Bocadillo: "no" }
+        }
+      },
+      {
+        id: 3,
+        title: "Club de lectura",
+        type: "Dos categorías",
+        checkpoint: "PISTAS",
+        situation: "Tres alumnos han elegido un libro y un lugar de lectura. Primero deduce el libro de cada persona. Después, el lugar.",
+        rows: ["Iria", "Mateo", "Noa"],
+        cols: ["Cómic", "Misterio", "Aventura", "Biblioteca", "Patio", "Aula"],
+        categoryBreaks: [3],
+        clues: [
+          "Iria no eligió cómic ni leyó en el patio.",
+          "Mateo eligió aventura.",
+          "Quien eligió misterio leyó en la biblioteca.",
+          "Noa leyó en el aula."
+        ],
+        solution: {
+          Iria: { Cómic: "no", Misterio: "yes", Aventura: "no", Biblioteca: "yes", Patio: "no", Aula: "no" },
+          Mateo: { Cómic: "no", Misterio: "no", Aventura: "yes", Biblioteca: "no", Patio: "yes", Aula: "no" },
+          Noa: { Cómic: "yes", Misterio: "no", Aventura: "no", Biblioteca: "no", Patio: "no", Aula: "yes" }
+        }
+      },
+      { id: 4, title: "Negativos en cadena", type: "Diseñado para crecer", lockedPlaceholder: true },
+      { id: 5, title: "Inferencias encadenadas", type: "Diseñado para crecer", lockedPlaceholder: true, checkpoint: "DEDUCCION" },
+      { id: 6, title: "Tabla completa", type: "Diseñado para crecer", lockedPlaceholder: true },
+      { id: 7, title: "Pistas ambiguas", type: "Diseñado para crecer", lockedPlaceholder: true },
+      { id: 8, title: "Reto final", type: "Diseñado para crecer", lockedPlaceholder: true, checkpoint: "SHERLOCK" }
+    ];
+
+    const state = {
+      currentLevel: 1,
+      maxUnlocked: clampUnlockedLevel(Number(localStorage.getItem("detectivesMaxUnlocked")) || 1),
+      board: {}
+    };
+
+    const levelsList = document.querySelector("#levelsList");
+    const gameArea = document.querySelector("#gameArea");
+    const progressText = document.querySelector("#progressText");
+    const progressFill = document.querySelector("#progressFill");
+    const codeInput = document.querySelector("#codeInput");
+    const codeButton = document.querySelector("#codeButton");
+
+    function clampUnlockedLevel(value) {
+      if (!Number.isFinite(value)) return 1;
+      return Math.min(Math.max(Math.trunc(value), 1), levels.length);
+    }
+
+    function saveProgress() {
+      localStorage.setItem("detectivesMaxUnlocked", String(state.maxUnlocked));
+    }
+
+    function getLevel(id) {
+      return levels.find(level => level.id === id) || levels[0];
+    }
+
+    function emptyBoard(level) {
+      const board = {};
+      level.rows.forEach(row => {
+        board[row] = {};
+        level.cols.forEach(col => {
+          board[row][col] = "unknown";
+        });
+      });
+      return board;
+    }
+
+    function renderLevels() {
+      levelsList.innerHTML = "";
+
+      levels.forEach(level => {
+        const unlocked = level.id <= state.maxUnlocked;
+        const card = document.createElement("article");
+        card.className = `level-card ${level.id === state.currentLevel ? "active" : ""} ${unlocked ? "" : "locked"}`;
+        card.innerHTML = `
+          <div class="level-title">
+            <span>Nivel ${level.id}</span>
+            <span>${unlocked ? "🔓" : "🔒"}</span>
+          </div>
+          <div class="level-meta"><strong>${level.title}</strong><br>${level.type}</div>
+        `;
+
+        card.addEventListener("click", () => {
+          if (!unlocked) return;
+          state.currentLevel = level.id;
+          loadLevel(level.id);
+        });
+
+        levelsList.appendChild(card);
+      });
+
+      progressText.textContent = `Nivel ${state.maxUnlocked} de ${levels.length} desbloqueado`;
+      progressFill.style.width = `${(state.maxUnlocked / levels.length) * 100}%`;
+    }
+
+    function loadLevel(id) {
+      const level = getLevel(id);
+      state.currentLevel = level.id;
+      renderLevels();
+
+      if (level.lockedPlaceholder) {
+        gameArea.innerHTML = `
+          <div class="mission-header">
+            <div>
+              <span class="badge">🚧 Próximamente</span>
+              <h2>Nivel ${level.id}: ${level.title}</h2>
+              <p class="situation">La arquitectura ya está preparada para añadir este caso al array <strong>levels</strong>. Solo faltan pistas, filas, columnas y solución.</p>
+            </div>
+          </div>
+          <div class="feedback warning">Este nivel está desbloqueado como checkpoint, pero todavía no tiene caso jugable en esta primera versión.</div>
+        `;
+        return;
+      }
+
+      state.board = emptyBoard(level);
+      renderGame(level);
+    }
+
+    function renderGame(level) {
+      const clueItems = level.clues.map((clue, index) => `
+        <li><span class="clue-number">${index + 1}</span><span>${clue}</span></li>
+      `).join("");
+
+      const headerCells = level.cols.map((col, index) => {
+        const extraStyle = level.categoryBreaks?.includes(index) ? "style='border-left: 4px solid #c7d2fe;'" : "";
+        return `<th ${extraStyle}>${col}</th>`;
+      }).join("");
+
+      const bodyRows = level.rows.map(row => {
+        const cells = level.cols.map((col, index) => {
+          const extraStyle = level.categoryBreaks?.includes(index) ? "style='border-left: 4px solid #c7d2fe;'" : "";
+          return `
+            <td ${extraStyle}>
+              <button class="cell-btn" data-row="${row}" data-col="${col}" aria-label="${row} - ${col}">${CELL.unknown}</button>
+            </td>
+          `;
+        }).join("");
+        return `<tr><td>${row}</td>${cells}</tr>`;
+      }).join("");
+
+      gameArea.innerHTML = `
+        <div class="mission-header">
+          <div>
+            <span class="badge">Caso ${level.id} · ${level.type}</span>
+            <h2>${level.title}</h2>
+            <p class="situation">${level.situation}</p>
+          </div>
+        </div>
+
+        <ul class="clues">${clueItems}</ul>
+
+        <div class="thinking-help" aria-label="Estrategia de resolución">
+          <div class="hint-card"><strong>1. Lee literal</strong>Primero marca solo lo que dicen las pistas de forma directa.</div>
+          <div class="hint-card"><strong>2. Descarta</strong>Si una persona ya tiene una opción segura, las demás de esa categoría suelen ser imposibles.</div>
+          <div class="hint-card"><strong>3. Comprueba</strong>Antes de validar, revisa si alguna fila o columna tiene dos ✅ donde solo debería haber una.</div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Detectives</th>${headerCells}</tr>
+            </thead>
+            <tbody>${bodyRows}</tbody>
+          </table>
+        </div>
+
+        <div class="actions">
+          <button class="btn-primary" id="checkButton" type="button">Comprobar hipótesis</button>
+          <button class="btn-ghost" id="logicButton" type="button">Buscar incoherencias</button>
+          <button class="btn-danger-soft" id="resetButton" type="button">Reiniciar caso</button>
+        </div>
+
+        <div class="feedback" id="feedback">Marca cada casilla: pendiente ·, seguro ✅ o imposible ❌. Después comprueba tu hipótesis.</div>
+        <div class="checkpoint" id="checkpointBox"></div>
+      `;
+
+      const cellButtons = gameArea.querySelectorAll(".cell-btn");
+      const checkButton = gameArea.querySelector("#checkButton");
+      const logicButton = gameArea.querySelector("#logicButton");
+      const resetButton = gameArea.querySelector("#resetButton");
+
+      cellButtons.forEach(button => {
+        button.addEventListener("click", () => cycleCell(button));
+      });
+
+      if (checkButton) checkButton.addEventListener("click", () => checkSolution(level));
+      if (logicButton) logicButton.addEventListener("click", () => checkInconsistencies(level));
+      if (resetButton) resetButton.addEventListener("click", () => loadLevel(level.id));
+    }
+
+    function cycleCell(button) {
+      const row = button.dataset.row;
+      const col = button.dataset.col;
+      const current = state.board[row][col];
+      const next = current === "unknown" ? "yes" : current === "yes" ? "no" : "unknown";
+      state.board[row][col] = next;
+
+      button.textContent = CELL[next];
+      button.classList.remove("yes", "no", "error");
+      if (next === "yes") button.classList.add("yes");
+      if (next === "no") button.classList.add("no");
+    }
+
+    function setFeedback(kind, message) {
+      const feedback = gameArea.querySelector("#feedback");
+      if (!feedback) return;
+      feedback.className = `feedback ${kind || ""}`;
+      feedback.innerHTML = message;
+    }
+
+    function markErrors(errors) {
+      gameArea.querySelectorAll(".cell-btn").forEach(button => button.classList.remove("error"));
+      errors.forEach(error => {
+        const button = gameArea.querySelector(`.cell-btn[data-row="${cssEscape(error.row)}"][data-col="${cssEscape(error.col)}"]`);
+        if (button) button.classList.add("error");
+      });
+    }
+
+    function cssEscape(value) {
+      if (window.CSS && typeof window.CSS.escape === "function") return CSS.escape(value);
+      return String(value).replace(/"/g, '\\"');
+    }
+
+    function checkSolution(level) {
+      const errors = [];
+      const pending = [];
+
+      level.rows.forEach(row => {
+        level.cols.forEach(col => {
+          const userValue = state.board[row][col];
+          const correctValue = level.solution[row][col];
+
+          if (userValue === "unknown") pending.push({ row, col });
+          else if (userValue !== correctValue) errors.push({ row, col });
+        });
+      });
+
+      markErrors(errors);
+
+      if (errors.length) {
+        setFeedback("danger", `Hay ${errors.length} marca${errors.length === 1 ? "" : "s"} que no encaja${errors.length === 1 ? "" : "n"} con las pistas. No cambio la respuesta: revisa las casillas destacadas.`);
+        return false;
+      }
+
+      if (pending.length) {
+        setFeedback("warning", `No hay errores en lo marcado, pero todavía quedan ${pending.length} casillas pendientes. Sigue descartando antes de cerrar el caso.`);
+        return false;
+      }
+
+      const nextLevel = Math.min(level.id + 1, levels.length);
+      if (nextLevel > state.maxUnlocked) {
+        state.maxUnlocked = nextLevel;
+        saveProgress();
+      }
+
+      renderLevels();
+      setFeedback("success", "Caso resuelto. Has usado las pistas de forma coherente y la tabla está completa.");
+      showCheckpoint(level);
+      return true;
+    }
+
+    function showCheckpoint(level) {
+      const checkpointBox = gameArea.querySelector("#checkpointBox");
+      if (!checkpointBox || !level.checkpoint) return;
+      checkpointBox.style.display = "block";
+      checkpointBox.innerHTML = `Código de progreso desbloqueado: <code>${level.checkpoint}</code>`;
+    }
+
+    function checkInconsistencies(level) {
+      const errors = [];
+      const groups = getCategoryGroups(level);
+
+      level.rows.forEach(row => {
+        groups.forEach(group => {
+          const yesCells = group.filter(col => state.board[row][col] === "yes");
+          if (yesCells.length > 1) yesCells.forEach(col => errors.push({ row, col }));
+        });
+      });
+
+      groups.forEach(group => {
+        group.forEach(col => {
+          const yesRows = level.rows.filter(row => state.board[row][col] === "yes");
+          if (yesRows.length > 1) yesRows.forEach(row => errors.push({ row, col }));
+        });
+      });
+
+      markErrors(errors);
+
+      if (errors.length) {
+        setFeedback("warning", "Hay una incoherencia interna: alguna fila o columna tiene demasiadas opciones seguras dentro de una categoría.");
+        return false;
+      }
+
+      setFeedback("success", "No detecto incoherencias internas en tu hipótesis. Ahora comprueba si coincide con todas las pistas.");
+      return true;
+    }
+
+    function getCategoryGroups(level) {
+      if (!level.categoryBreaks || level.categoryBreaks.length === 0) return [level.cols];
+      const points = [0, ...level.categoryBreaks, level.cols.length];
+      const groups = [];
+      for (let i = 0; i < points.length - 1; i++) {
+        groups.push(level.cols.slice(points[i], points[i + 1]));
+      }
+      return groups;
+    }
+
+    codeButton.addEventListener("click", () => {
+      const code = codeInput.value.trim().toUpperCase();
+      const unlockLevel = unlockCodes[code];
+
+      if (!unlockLevel) {
+        codeInput.value = "";
+        alert("Ese código no está activo. Revisa mayúsculas o pide una pista al profe.");
+        return;
+      }
+
+      state.maxUnlocked = Math.max(state.maxUnlocked, unlockLevel);
+      state.currentLevel = unlockLevel;
+      saveProgress();
+      codeInput.value = "";
+      loadLevel(unlockLevel);
+    });
+
+    codeInput.addEventListener("keydown", event => {
+      if (event.key === "Enter") codeButton.click();
+    });
+
+    function runSmokeTests() {
+      const testLevel = levels[0];
+      const requiredStaticNodes = [levelsList, gameArea, progressText, progressFill, codeInput, codeButton];
+      console.assert(requiredStaticNodes.every(Boolean), "Test DOM inicial: faltan nodos base de la app.");
+      console.assert(Array.isArray(levels) && levels.length >= 8, "Test niveles: deberían existir al menos 8 niveles.");
+      console.assert(testLevel.rows.length === 2 && testLevel.cols.length === 2, "Test nivel 1: debería ser 2x2.");
+      console.assert(Object.keys(unlockCodes).includes("DETECTIVE"), "Test códigos: falta el código DETECTIVE.");
+
+      loadLevel(1);
+      console.assert(Boolean(gameArea.querySelector("#checkButton")), "Test render: falta #checkButton.");
+      console.assert(Boolean(gameArea.querySelector("#logicButton")), "Test render: falta #logicButton.");
+      console.assert(Boolean(gameArea.querySelector("#resetButton")), "Test render: falta #resetButton.");
+      console.assert(gameArea.querySelectorAll(".cell-btn").length === 4, "Test render: el nivel 1 debería tener 4 casillas interactivas.");
+    }
+
+    renderLevels();
+    loadLevel(state.currentLevel);
+    runSmokeTests();
+  </script>
+</body>
+</html>
