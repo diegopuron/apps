@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Taller programación y lógica</title>
+<style>
+body{font-family:Arial;margin:0;background:#eef2f5;color:#263238}
+header{background:#2da7e0;color:white;padding:1rem}
+main{display:grid;grid-template-columns:1fr 1fr;gap:1rem;padding:1rem}
+section{background:white;padding:1rem;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.board-panel{position:sticky;top:1rem;height:max-content}
+button{margin:.2rem;padding:.55rem .75rem;border-radius:8px;border:none;cursor:pointer;font-weight:bold;background:#e3f2fd}
+button:disabled{opacity:.45;cursor:not-allowed}
+.nav button{background:#bbdefb}.nav button.active{background:#fff176}
+.grid{display:grid;grid-template-columns:repeat(8,40px);width:max-content;border:2px solid #90a4ae;background:white}
+.cell{width:40px;height:40px;border:1px solid #ccc;display:flex;align-items:center;justify-content:center;font-size:1.3rem}
+.wall{background:#607d8b;color:white}
+.notice{padding:.7rem;border-radius:10px;background:#fff8dc;border-left:5px solid #ffd84d;margin:.5rem 0}
+.ok{display:inline-block;background:#e8f5e9;border-left:5px solid #4caf50;padding:.45rem;border-radius:8px}
+.warning{display:inline-block;background:#ffebee;border-left:5px solid #ef5350;padding:.45rem;border-radius:8px}
+.teacher{background:#e3f2fd;border-left:5px solid #2da7e0;padding:.7rem;border-radius:10px;margin-top:.6rem}
+textarea{width:100%;height:80px;border-radius:8px;border:1px solid #b0bec5;padding:.5rem}
+#program{min-height:32px;background:#f4f6f8;border-radius:8px;padding:.5rem;margin:.4rem 0;line-height:1.5}
+.program-block{display:inline-block;margin:.15rem;padding:.4rem .55rem;border-radius:8px;background:#bbdefb;border:2px solid transparent}
+.program-block.active{background:#fff176;border-color:#f9a825;transform:scale(1.04)}
+.program-block.done{background:#c8e6c9;text-decoration:line-through;color:#455a64}
+.program-block.repeat-expanded{background:#ffe0b2;border-style:dashed}
+#result,#unlockResult,#planResult,#crackResult{line-height:1.4}
+.block-list{display:flex;flex-wrap:wrap;gap:.25rem}.block-list button{background:#bbdefb}
+.hidden{display:none}.symbolBtn{font-size:1.4rem;background:#f3e5f5}.attempt{padding:.4rem;border-bottom:1px solid #ddd}
+input[type=password],input[type=text],select{padding:.5rem;border-radius:8px;border:1px solid #b0bec5;margin:.2rem}
+.checkpoint{background:#e8f5e9;border-left:5px solid #4caf50;padding:.7rem;border-radius:10px;margin:.5rem 0}
+.keybox{background:#f3e5f5;border-left:5px solid #8e24aa;padding:.7rem;border-radius:10px;margin:.5rem 0}
+.badge{display:inline-block;background:#263238;color:white;border-radius:999px;padding:.25rem .6rem;margin:.15rem;font-size:.85rem}
+</style>
+</head>
+<body>
+<header>
+<h2>Piensa → Programa → Comprueba | Taller de pensamiento computacional</h2>
+<div class="nav">
+<button id="tabRobot" class="active" onclick="showTab('robot')">Misiones robot</button>
+<button id="tabCrack" onclick="showTab('crack')">Crackea el código</button>
+</div>
+</header>
+
+<main id="robotApp">
+<section>
+<h3 id="missionTitle">Misión 1</h3>
+<p id="missionText">Llega a la estrella.</p>
+<div class="notice">Antes de ejecutar, explica tu plan y construye tu programa. Después avisa al profe para desbloquear la ejecución.</div>
+<div class="keybox">
+<strong>¿Ya tienes un código de progreso?</strong><br>
+Escríbelo para continuar desde un checkpoint sin repetir todo desde el principio.<br>
+<input id="progressCode" type="text" placeholder="Ej: PLANIFICA" />
+<button onclick="useProgressCode()">Usar código</button>
+<p id="progressResult"></p>
+</div>
+<div id="checkpointBox" class="checkpoint" style="display:none"></div>
+
+<h3>1. Explica tu plan</h3>
+<textarea id="plan" placeholder="Ejemplo: Primero avanzo... después giro..."></textarea>
+<button onclick="validatePlan()">Validar explicación</button>
+<p id="planResult"></p>
+
+<h3>2. Programa</h3>
+<div class="block-list">
+<button onclick="addBlock('move')">Avanzar</button>
+<button onclick="addBlock('left')">Girar izq</button>
+<button onclick="addBlock('right')">Girar der</button>
+<button onclick="addBlock('repeat')">Repetir anterior</button>
+</div>
+<div id="program">Todavía no hay bloques.</div>
+<button onclick="clearProgram()">Borrar programa</button>
+
+<h3>3. Revisa</h3>
+<button onclick="checkCoherence()">Comprobar coherencia</button>
+<p id="result"></p>
+
+<h3>4. Validación del profe</h3>
+<button onclick="askTeacher()">Avisa a tu profe</button>
+<div id="teacherBox" class="teacher" style="display:none">
+<strong>Revisión rápida del profe</strong>
+<p id="teacherSummary"></p>
+<input id="teacherCode" type="password" placeholder="Código del profe" />
+<button onclick="unlockRun()">Desbloquear ejecución</button>
+<p id="unlockResult"></p>
+</div>
+
+<h3>5. Ejecuta</h3>
+<button id="runBtn" onclick="runProgram()" disabled>Ejecutar misión</button>
+<button id="nextBtn" onclick="nextMission()" disabled>Siguiente misión</button>
+</section>
+
+<section class="board-panel">
+<h3>Tablero</h3>
+<div id="grid" class="grid"></div>
+<div class="notice">
+<strong>Cómo se mueve el robot:</strong><br>
+Avanzar mueve una casilla en la dirección de la flecha. Girar cambia la dirección, pero no cambia de casilla. Las rocas no se pueden atravesar.
+</div>
+<div class="notice">
+<strong>Ejecución rápida</strong><br>
+<button id="runBtnBoard" onclick="runProgram()" disabled>Ejecutar misión</button>
+<button id="nextBtnBoard" onclick="nextMission()" disabled>Siguiente misión</button>
+</div>
+</section>
+</main>
+
+<main id="crackApp" class="hidden">
+<section>
+<h3>Crackea el código</h3>
+<p>Elige una dificultad. Cada símbolo tiene un valor secreto. Prueba combinaciones y usa las pistas para deducir el código.</p>
+<div class="notice">
+<strong>Objetivo:</strong> encontrar el código exacto. Esto trabaja ensayo sistemático, descarte de posibilidades, patrones y depuración de hipótesis.
+</div>
+<label>Dificultad:</label>
+<select id="difficulty" onchange="newCrackGame()">
+<option value="easy">Fácil: 3 símbolos</option>
+<option value="medium">Media: 4 símbolos</option>
+<option value="hard">Difícil: 4 símbolos con repetición</option>
+</select>
+<button onclick="newCrackGame()">Nuevo código</button>
+<h4>Construye tu intento</h4>
+<div id="symbolPalette"></div>
+<p><strong>Intento:</strong> <span id="currentGuess">—</span></p>
+<button onclick="deleteGuessSymbol()">Borrar último</button>
+<button onclick="checkGuess()">Probar intento</button>
+<p id="crackResult"></p>
+<div id="crackCheckpointBox" class="checkpoint" style="display:none"></div>
+</section>
+<section>
+<h3>Pistas</h3>
+<div class="notice" id="crackRules"></div>
+<h3>Historial</h3>
+<div id="attempts"></div>
+</section>
+</main>
+
+<script>
+const TEACHER_CODE = '1234';
+const directions = ['up', 'right', 'down', 'left'];
+const directionSymbols = { up: '⬆️', right: '➡️', down: '⬇️', left: '⬅️' };
+
+const progressCodes = {
+ GIRO: {mission:2, message:'Código GIRO aceptado. Saltas a la Misión 3: giros.'},
+ PLANIFICA: {mission:4, message:'Código PLANIFICA aceptado. Saltas a la Misión 5: obstáculos.'},
+ BUCLE: {mission:5, message:'Código BUCLE aceptado. Saltas a la Misión 6: repetir y rodear.'},
+ DEPURA: {mission:6, message:'Código DEPURA aceptado. Saltas a la Misión 7: depuración.'},
+ EXPERTO: {mission:7, message:'Código EXPERTO aceptado. Saltas al reto final.'}
+};
+
+const robotCheckpoints = {
+ 1: {code:'GIRO', text:'Has superado la base de secuencia y conteo. Anota el código GIRO para empezar otro día desde los giros.'},
+ 3: {code:'PLANIFICA', text:'Has superado giros y planificación. Anota el código PLANIFICA para empezar otro día desde obstáculos.'},
+ 5: {code:'BUCLE', text:'Has superado obstáculos y repetición. Anota el código BUCLE para continuar desde retos avanzados.'},
+ 6: {code:'DEPURA', text:'Has llegado a depuración. Anota el código DEPURA para continuar desde aquí.'},
+ 7: {code:'EXPERTO', text:'Has completado el reto final. Código EXPERTO conseguido.'}
+};
+
+const missions = [
+ {title:'Misión 1',text:'Llega a la estrella avanzando en línea recta.',start:{x:0,y:3,dir:'right'},goal:{x:4,y:3},walls:[]},
+ {title:'Misión 2',text:'Cuenta bien las casillas y llega exacto a la estrella.',start:{x:0,y:3,dir:'right'},goal:{x:5,y:3},walls:[]},
+ {title:'Misión 3',text:'Necesitas girar una vez para llegar.',start:{x:0,y:3,dir:'right'},goal:{x:4,y:1},walls:[]},
+ {title:'Misión 4',text:'Camino con dos giros.',start:{x:0,y:5,dir:'right'},goal:{x:5,y:2},walls:[]},
+ {title:'Misión 5',text:'Rodea las rocas. Ya no vale ir en línea recta.',start:{x:0,y:3,dir:'right'},goal:{x:7,y:3},walls:[{x:3,y:2},{x:3,y:3},{x:3,y:4}]},
+ {title:'Misión 6',text:'Usa repetir y giros para rodear el muro.',start:{x:0,y:6,dir:'right'},goal:{x:7,y:1},walls:[{x:2,y:4},{x:3,y:4},{x:4,y:4},{x:5,y:4},{x:5,y:3},{x:5,y:2}]},
+ {title:'Misión 7: depuración',text:'Reto de error: construye un programa, ejecútalo, observa dónde falla y corrígelo.',start:{x:1,y:6,dir:'up'},goal:{x:6,y:1},walls:[{x:1,y:3},{x:2,y:3},{x:3,y:3},{x:4,y:3},{x:4,y:2},{x:4,y:1}]},
+ {title:'Misión 8: reto final',text:'Llega a la estrella usando el menor número de bloques posible y sin chocar.',start:{x:0,y:7,dir:'right'},goal:{x:7,y:0},walls:[{x:2,y:7},{x:2,y:6},{x:2,y:5},{x:4,y:4},{x:5,y:4},{x:6,y:4},{x:6,y:3},{x:6,y:2}]}
+];
+
+let current = 0;
+let program = [];
+let planOk = false;
+let teacherOk = false;
+let missionSolved = false;
+let robot = {x:0,y:3,dir:'right'};
+let goal = {x:4,y:3};
+let isRunning = false;
+let executionSteps = [];
+let activeStepIndex = -1;
+
+function showTab(tab){
+ document.getElementById('robotApp').classList.toggle('hidden', tab !== 'robot');
+ document.getElementById('crackApp').classList.toggle('hidden', tab !== 'crack');
+ document.getElementById('tabRobot').classList.toggle('active', tab === 'robot');
+ document.getElementById('tabCrack').classList.toggle('active', tab === 'crack');
+ if(tab === 'crack') suggestCrackDifficulty();
+}
+
+function setRunDisabled(value){
+ document.getElementById('runBtn').disabled = value;
+ document.getElementById('runBtnBoard').disabled = value;
+}
+function setNextDisabled(value){
+ document.getElementById('nextBtn').disabled = value;
+ document.getElementById('nextBtnBoard').disabled = value;
+}
+function currentMission(){ return missions[current]; }
+function isWall(x,y){ return currentMission().walls.some(w => w.x === x && w.y === y); }
+
+function loadMission(){
+ const m = currentMission();
+ document.getElementById('missionTitle').textContent = m.title;
+ document.getElementById('missionText').textContent = m.text;
+ robot = {...m.start};
+ goal = {...m.goal};
+ program = [];
+ planOk = false;
+ teacherOk = false;
+ missionSolved = false;
+ document.getElementById('plan').value = '';
+ document.getElementById('planResult').textContent = '';
+ document.getElementById('program').textContent = 'Todavía no hay bloques.';
+ document.getElementById('result').textContent = '';
+ document.getElementById('teacherBox').style.display = 'none';
+ document.getElementById('teacherCode').value = '';
+ document.getElementById('unlockResult').textContent = '';
+ document.getElementById('checkpointBox').style.display = 'none';
+ document.getElementById('checkpointBox').innerHTML = '';
+ setRunDisabled(true); setNextDisabled(true); render();
+}
+
+function render(){
+ const grid = document.getElementById('grid');
+ grid.innerHTML = '';
+ for(let y=0; y<8; y++){
+  for(let x=0; x<8; x++){
+   const c = document.createElement('div');
+   c.className = 'cell';
+   if(isWall(x,y)){ c.classList.add('wall'); c.textContent = '🪨'; }
+   if(x === goal.x && y === goal.y) c.textContent = '⭐';
+   if(x === robot.x && y === robot.y) c.textContent = directionSymbols[robot.dir];
+   grid.appendChild(c);
+  }
+ }
+}
+
+function addBlock(type){ program.push(type); renderProgram(); teacherOk=false; missionSolved=false; setRunDisabled(true); setNextDisabled(true); }
+function renderProgram(){
+ const names = {move:'Avanzar', left:'Girar izquierda', right:'Girar derecha', repeat:'Repetir anterior'};
+ const box = document.getElementById('program');
+ if(program.length === 0){ box.textContent = 'Todavía no hay bloques.'; return; }
+ box.innerHTML = program.map((b,i)=>`<span class="program-block" id="block-${i}">${i+1}. ${names[b]}</span>`).join(' ');
+}
+function clearProgram(){ program=[]; renderProgram(); teacherOk=false; missionSolved=false; setRunDisabled(true); setNextDisabled(true); }
+
+function validatePlan(){
+ const t = document.getElementById('plan').value.toLowerCase().trim();
+ if(t.length < 20){ document.getElementById('planResult').innerHTML='<span class="warning">Explica mejor el plan antes de seguir.</span>'; planOk=false; }
+ else if(!t.includes('avanz') && !t.includes('gir') && !t.includes('repet') && !t.includes('rodea')){ document.getElementById('planResult').innerHTML='<span class="warning">Usa palabras de programación: avanzar, girar, repetir, rodear...</span>'; planOk=false; }
+ else{ document.getElementById('planResult').innerHTML='<span class="ok">Explicación suficiente. Ahora programa.</span>'; planOk=true; }
+ teacherOk=false; setRunDisabled(true);
+}
+function countWord(text, word){ return (text.match(new RegExp(word,'g')) || []).length; }
+function getCoherenceFeedback(){
+ const text = document.getElementById('plan').value.toLowerCase();
+ const feedback = [];
+ const avanzarText=countWord(text,'avanz'), girarText=countWord(text,'gir'), repetirText=countWord(text,'repet');
+ const avanzarProg=program.filter(b=>b==='move').length, girarProg=program.filter(b=>b==='left'||b==='right').length, repetirProg=program.filter(b=>b==='repeat').length;
+ if(avanzarText>0 && avanzarProg===0) feedback.push('Dices avanzar, pero no hay bloques de avanzar.');
+ if(girarText>0 && girarProg===0) feedback.push('Dices girar, pero no hay giros.');
+ if(repetirText>0 && repetirProg===0) feedback.push('Dices repetir, pero no hay bucle.');
+ if(avanzarProg>0 && avanzarText===0) feedback.push('Programas avanzar, pero no lo explicas.');
+ if(girarProg>0 && girarText===0) feedback.push('Programas giros, pero no los explicas.');
+ if(repetirProg>0 && repetirText===0) feedback.push('Usas repetir, pero no lo explicas.');
+ return feedback;
+}
+function checkCoherence(){
+ const feedback=getCoherenceFeedback();
+ if(!planOk){ document.getElementById('result').textContent='Primero valida la explicación.'; return; }
+ if(program.length===0){ document.getElementById('result').textContent='Todavía no has puesto bloques.'; return; }
+ document.getElementById('result').textContent = feedback.length ? feedback.join(' ') : 'Plan y programa parecen coherentes. Ahora avisa a tu profe.';
+}
+function askTeacher(){
+ document.getElementById('teacherBox').style.display='block';
+ const feedback=getCoherenceFeedback(); const plan=document.getElementById('plan').value.trim();
+ document.getElementById('teacherSummary').innerHTML='<strong>Plan del alumno:</strong><br>'+escapeHtml(plan||'Sin explicación')+'<br><br><strong>Programa:</strong><br>'+escapeHtml(document.getElementById('program').textContent||'Sin bloques')+'<br><br><strong>Avisos automáticos:</strong><br>'+(feedback.length?feedback.map(escapeHtml).join('<br>'):'Sin avisos de incoherencia.');
+}
+function unlockRun(){
+ const code=document.getElementById('teacherCode').value;
+ if(!planOk){ document.getElementById('unlockResult').textContent='Todavía no validó la explicación.'; return; }
+ if(program.length===0){ document.getElementById('unlockResult').textContent='Todavía no hay programa.'; return; }
+ if(code===TEACHER_CODE){ teacherOk=true; setRunDisabled(false); document.getElementById('unlockResult').textContent='Ejecución desbloqueada.'; document.querySelector('.board-panel').scrollIntoView({behavior:'smooth',block:'nearest'}); }
+ else{ document.getElementById('unlockResult').textContent='Código incorrecto.'; }
+}
+function expandProgram(blocks){
+ const expanded=[];
+ blocks.forEach((block,originalIndex)=>{
+  if(block==='repeat'){ const previous=expanded[expanded.length-1]; if(previous) expanded.push({...previous,repeated:true,repeatSourceIndex:originalIndex}); }
+  else expanded.push({type:block,originalIndex,repeated:false});
+ });
+ return expanded;
+}
+function turnLeft(dir){ return directions[(directions.indexOf(dir)+3)%4]; }
+function turnRight(dir){ return directions[(directions.indexOf(dir)+1)%4]; }
+function moveForward(position){
+ const next={...position};
+ if(next.dir==='up') next.y--; if(next.dir==='right') next.x++; if(next.dir==='down') next.y++; if(next.dir==='left') next.x--;
+ return next;
+}
+function executeProgram(start, blocks){
+ let pos={...start};
+ for(const step of expandProgram(blocks)){ if(step.type==='left') pos.dir=turnLeft(pos.dir); if(step.type==='right') pos.dir=turnRight(pos.dir); if(step.type==='move') pos=moveForward(pos); }
+ return pos;
+}
+async function runProgram(){
+ if(isRunning) return;
+ if(!teacherOk){ document.getElementById('result').textContent='Antes debe desbloquearlo el profe.'; return; }
+ const m=currentMission(); robot={...m.start}; executionSteps=expandProgram(program); activeStepIndex=-1; isRunning=true; setRunDisabled(true); setNextDisabled(true); render(); renderProgram(); document.querySelector('.board-panel').scrollIntoView({behavior:'smooth',block:'nearest'});
+ for(let i=0;i<executionSteps.length;i++){
+  activeStepIndex=i; highlightExecutionStep(i); await wait(650); applyStep(executionSteps[i].type); render(); await wait(450);
+  if(robot.x<0||robot.x>7||robot.y<0||robot.y>7){ finishFailed('El robot se salió del tablero. Corrige el programa y vuelve a avisar al profe.'); return; }
+  if(isWall(robot.x,robot.y)){ finishFailed('El robot chocó con una roca. Necesitas rodear el obstáculo.'); return; }
+ }
+ markAllBlocksDone(); isRunning=false;
+ if(robot.x===goal.x&&robot.y===goal.y){ document.getElementById('result').textContent='¡Misión conseguida!'; missionSolved=true; setNextDisabled(false); }
+ else finishFailed('No llegó. Corrige el plan o el programa y vuelve a avisar al profe.');
+}
+function applyStep(block){ if(block==='left') robot.dir=turnLeft(robot.dir); if(block==='right') robot.dir=turnRight(robot.dir); if(block==='move') robot=moveForward(robot); }
+function highlightExecutionStep(i){
+ document.querySelectorAll('.program-block').forEach(el=>{el.classList.remove('active');el.classList.remove('repeat-expanded');});
+ const step=executionSteps[i];
+ for(let j=0;j<i;j++){ const prev=executionSteps[j]; const prevBlock=document.getElementById(`block-${prev.originalIndex}`); if(prevBlock) prevBlock.classList.add('done'); }
+ const active=document.getElementById(`block-${step.originalIndex}`); if(active){ active.classList.add('active'); if(step.repeated) active.classList.add('repeat-expanded'); }
+ document.getElementById('result').textContent=`Ejecutando ${step.repeated?'repetición del bloque anterior':'bloque'} ${step.originalIndex+1}...`;
+}
+function markAllBlocksDone(){ document.querySelectorAll('.program-block').forEach(el=>{el.classList.remove('active');el.classList.remove('repeat-expanded');el.classList.add('done');}); }
+function finishFailed(message){ isRunning=false; teacherOk=false; document.getElementById('result').textContent=message; setRunDisabled(true); setNextDisabled(true); }
+function wait(ms){ return new Promise(resolve=>setTimeout(resolve,ms)); }
+function nextMission(){
+ if(!missionSolved) return;
+ const checkpoint = robotCheckpoints[current];
+ if(checkpoint){
+  showCheckpoint(checkpoint);
+  if(current === 3){
+   unlockCrackPrompt('easy','Has desbloqueado un reto lógico fácil antes de entrar en obstáculos.');
+   return;
+  }
+  if(current === 5){
+   unlockCrackPrompt('medium','Has desbloqueado un reto lógico medio antes de la depuración.');
+   return;
+  }
+  if(current === 7){
+   unlockCrackPrompt('hard','Has desbloqueado el reto lógico difícil.');
+   return;
+  }
+ }
+ if(current < missions.length - 1){ current++; loadMission(); }
+ else document.getElementById('result').textContent='Has terminado las misiones disponibles.';
+}
+
+function continueAfterCheckpoint(){
+ if(current < missions.length - 1){ current++; loadMission(); }
+ else document.getElementById('result').textContent='Has terminado las misiones disponibles.';
+}
+
+function showCheckpoint(checkpoint){
+ const box = document.getElementById('checkpointBox');
+ box.style.display = 'block';
+ box.innerHTML = `<strong>Checkpoint conseguido</strong><br>${checkpoint.text}<br><span class="badge">${checkpoint.code}</span><br><button onclick="continueAfterCheckpoint()">Continuar misiones</button>`;
+ document.getElementById('result').textContent = 'Checkpoint conseguido. Anota tu código antes de continuar.';
+}
+
+function useProgressCode(){
+ const raw = document.getElementById('progressCode').value.trim().toUpperCase();
+ const data = progressCodes[raw];
+ if(!data){
+  document.getElementById('progressResult').innerHTML = '<span class="warning">Código no reconocido. Revisa cómo lo has escrito.</span>';
+  return;
+ }
+ current = data.mission;
+ loadMission();
+ document.getElementById('progressResult').innerHTML = `<span class="ok">${data.message}</span>`;
+}
+
+function unlockCrackPrompt(difficulty, message){
+ const box = document.getElementById('checkpointBox');
+ box.style.display = 'block';
+ box.innerHTML += `<div class="keybox"><strong>Reto lógico desbloqueado</strong><br>${message}<br><button onclick="openCrackFromRobot('${difficulty}')">Ir a Crackea el código</button><button onclick="continueAfterCheckpoint()">Seguir con robot</button></div>`;
+}
+
+function openCrackFromRobot(difficulty){
+ document.getElementById('difficulty').value = difficulty;
+ newCrackGame();
+ showTab('crack');
+}
+function escapeHtml(value){ return String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;'); }
+
+// Crackea el código
+const symbols = ['◆','●','▲','■','★','☘'];
+let secret = [];
+let guess = [];
+let attempts = [];
+
+function newCrackGame(){
+ const difficulty = document.getElementById('difficulty').value;
+ const length = difficulty === 'easy' ? 3 : 4;
+ const allowRepeat = difficulty === 'hard';
+ secret = [];
+ const pool = [...symbols];
+ for(let i=0;i<length;i++){
+  const index = Math.floor(Math.random()*pool.length);
+  secret.push(pool[index]);
+  if(!allowRepeat) pool.splice(index,1);
+ }
+ guess=[]; attempts=[];
+ renderCrack();
+ document.getElementById('crackResult').textContent='Nuevo código preparado. Empieza probando una hipótesis.';
+ document.getElementById('attempts').innerHTML='';
+ document.getElementById('crackCheckpointBox').style.display='none';
+ document.getElementById('crackCheckpointBox').innerHTML='';
+ document.getElementById('crackRules').innerHTML=`El código tiene <strong>${length}</strong> símbolos. ${allowRepeat?'Puede repetir símbolos.':'No repite símbolos.'}<br>🟢 = símbolo correcto en posición correcta.<br>🟡 = símbolo correcto en posición incorrecta.<br>⚪ = símbolo que no aparece.`;
+}
+
+function suggestCrackDifficulty(){
+ const difficulty = current >= 6 ? 'hard' : current >= 4 ? 'medium' : 'easy';
+ document.getElementById('difficulty').value = difficulty;
+}
+function renderCrack(){
+ document.getElementById('symbolPalette').innerHTML=symbols.map(s=>`<button class="symbolBtn" onclick="addGuessSymbol('${s}')">${s}</button>`).join('');
+ document.getElementById('currentGuess').textContent=guess.length?guess.join(' '):'—';
+}
+function addGuessSymbol(s){ const max=secret.length; if(guess.length<max){ guess.push(s); renderCrack(); } }
+function deleteGuessSymbol(){ guess.pop(); renderCrack(); }
+function checkGuess(){
+ if(guess.length!==secret.length){ document.getElementById('crackResult').textContent=`El intento debe tener ${secret.length} símbolos.`; return; }
+ const feedback = getMastermindFeedback(guess, secret);
+ attempts.push({guess:[...guess],feedback});
+ renderAttempts();
+ if(feedback.green===secret.length){
+  const difficulty = document.getElementById('difficulty').value;
+  const crackCode = difficulty === 'easy' ? 'LOGICA' : difficulty === 'medium' ? 'PATRON' : 'MASTER';
+  document.getElementById('crackResult').innerHTML='<span class="ok">¡Código crackeado! Has usado lógica y descarte de posibilidades.</span>';
+  document.getElementById('crackCheckpointBox').style.display='block';
+  document.getElementById('crackCheckpointBox').innerHTML=`<strong>Código lógico conseguido</strong><br>Anótalo en tu hoja de progreso:<br><span class="badge">${crackCode}</span><br><button onclick="showTab('robot')">Volver a misiones robot</button>`;
+ }
+ else{ document.getElementById('crackResult').textContent='Pista generada. Ajusta tu hipótesis y prueba otra combinación.'; }
+ guess=[]; renderCrack();
+}
+function getMastermindFeedback(g,s){
+ let green=0,yellow=0,white=0;
+ const remainingSecret=[]; const remainingGuess=[];
+ for(let i=0;i<s.length;i++){ if(g[i]===s[i]) green++; else{ remainingSecret.push(s[i]); remainingGuess.push(g[i]); } }
+ for(const item of remainingGuess){ const idx=remainingSecret.indexOf(item); if(idx>=0){ yellow++; remainingSecret.splice(idx,1); } else white++; }
+ return {green,yellow,white};
+}
+function renderAttempts(){
+ document.getElementById('attempts').innerHTML=attempts.map((a,i)=>`<div class="attempt"><strong>${i+1}.</strong> ${a.guess.join(' ')} → 🟢 ${a.feedback.green} | 🟡 ${a.feedback.yellow} | ⚪ ${a.feedback.white}</div>`).join('');
+}
+
+function runTests(){
+ const test1=executeProgram({x:0,y:0,dir:'right'},['move','move']); console.assert(test1.x===2&&test1.y===0&&test1.dir==='right','Test 1');
+ const test2=executeProgram({x:0,y:0,dir:'right'},['left','move']); console.assert(test2.x===0&&test2.y===-1&&test2.dir==='up','Test 2');
+ const test3=executeProgram({x:0,y:0,dir:'right'},['move','repeat']); console.assert(test3.x===2&&test3.y===0,'Test 3');
+ const test4=executeProgram({x:0,y:0,dir:'right'},['right','move']); console.assert(test4.x===0&&test4.y===1&&test4.dir==='down','Test 4');
+ const test5=expandProgram(['move','left','repeat']); console.assert(test5.length===3&&test5[2].type==='left'&&test5[2].repeated===true,'Test 5');
+ const test6=getMastermindFeedback(['◆','●','▲'],['◆','▲','■']); console.assert(test6.green===1&&test6.yellow===1&&test6.white===1,'Test 6 mastermind');
+}
+runTests(); loadMission(); newCrackGame();
+</script>
+</body>
+</html>
