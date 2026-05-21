@@ -15,13 +15,16 @@
   --radius: 24px;
 }
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 body {
   margin: 0;
   min-height: 100vh;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: var(--text);
+
   background:
     radial-gradient(circle at top left, rgba(79, 70, 229, 0.16), transparent 32rem),
     radial-gradient(circle at top right, rgba(6, 182, 212, 0.16), transparent 30rem),
@@ -29,7 +32,7 @@ body {
 }
 
 .app-shell {
-  width: min(1180px, calc(100% - 32px));
+  width: min(1400px, calc(100% - 32px));
   margin: 0 auto;
   padding: 28px 0 48px;
 }
@@ -66,7 +69,13 @@ header.hero {
   width: 220px;
   height: 220px;
   border-radius: 999px;
-  background: linear-gradient(135deg, rgba(79, 70, 229, 0.18), rgba(6, 182, 212, 0.12));
+
+  background: linear-gradient(
+    135deg,
+    rgba(79, 70, 229, 0.18),
+    rgba(6, 182, 212, 0.12)
+  );
+
   right: -70px;
   top: -80px;
 }
@@ -77,14 +86,17 @@ header.hero {
   align-items: center;
   padding: 8px 12px;
   border-radius: 999px;
+
   background: rgba(79, 70, 229, 0.1);
   color: var(--primary-dark);
+
   font-weight: 700;
   font-size: 0.9rem;
 }
 
 h1 {
   margin: 18px 0 10px;
+
   font-size: clamp(2rem, 4vw, 4rem);
   line-height: 1;
   letter-spacing: -0.06em;
@@ -93,6 +105,7 @@ h1 {
 .hero-main p {
   max-width: 760px;
   margin: 0;
+
   color: var(--muted);
   font-size: 1.08rem;
   line-height: 1.6;
@@ -100,6 +113,7 @@ h1 {
 
 .progress-card {
   padding: 24px;
+
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -110,6 +124,7 @@ h1 {
 .panel h2,
 .logic-card h2 {
   margin: 0;
+
   font-size: 1.2rem;
   letter-spacing: -0.02em;
 }
@@ -124,7 +139,9 @@ h1 {
 .progress-fill {
   height: 100%;
   width: 12.5%;
+
   background: linear-gradient(90deg, var(--primary), var(--accent));
+
   border-radius: 999px;
   transition: width 0.25s ease;
 }
@@ -137,11 +154,15 @@ h1 {
 
 input[type="text"] {
   width: 100%;
+
   border: 1px solid var(--border);
   border-radius: 16px;
+
   padding: 12px 14px;
+
   font: inherit;
   outline: none;
+
   background: #fff;
 }
 
@@ -154,18 +175,35 @@ button {
   border: 0;
   border-radius: 16px;
   padding: 12px 16px;
+
   font: inherit;
   font-weight: 750;
+
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.15s ease;
 }
 
-button:hover { transform: translateY(-1px); }
-button:active { transform: translateY(0); }
+button:hover {
+  transform: translateY(-1px);
+}
+
+button:active {
+  transform: translateY(0);
+}
 
 .btn-primary {
   color: #fff;
-  background: linear-gradient(135deg, var(--primary), var(--accent));
+
+  background: linear-gradient(
+    135deg,
+    var(--primary),
+    var(--accent)
+  );
+
   box-shadow: 0 12px 24px rgba(79, 70, 229, 0.24);
 }
 
@@ -179,80 +217,80 @@ button:active { transform: translateY(0); }
   background: rgba(220, 38, 38, 0.09);
 }
 
+/* NUEVO LAYOUT COMPACTO */
+
 .layout {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 18px;
-  align-items: start;
+  gap: 20px;
 }
 
 .panel {
   padding: 16px;
 }
 
-.panel h2 {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
 .levels {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(86px, 1fr));
-  gap: 8px;
-  margin-top: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+  gap: 10px;
+  margin-top: 16px;
 }
 
-.level-card {
-  border-radius: 16px;
-  padding: 9px 10px;
-  box-shadow: none;
-  cursor: pointer;
-  min-height: 68px;
-  transition: transform 0.15s ease, border 0.15s ease, background 0.15s ease;
+.level-chip {
+  border: 1px solid var(--border);
+  background: white;
+
+  border-radius: 18px;
+
+  padding: 10px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  min-height: 78px;
+
+  font-weight: 800;
+
+  transition:
+    transform 0.15s ease,
+    border 0.15s ease,
+    background 0.15s ease;
 }
 
-.level-card:hover { transform: translateY(-1px); }
+.level-chip:hover {
+  transform: translateY(-1px);
+}
 
-.level-card.active {
+.level-chip.active {
   border-color: rgba(79, 70, 229, 0.45);
   background: rgba(79, 70, 229, 0.07);
 }
 
-.level-card.locked {
-  opacity: 0.52;
-  cursor: not-allowed;
+.level-chip.locked {
+  opacity: 0.45;
 }
 
-.level-title {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  font-weight: 900;
-  font-size: 0.9rem;
+.chip-number {
+  font-size: 1.15rem;
 }
 
-.level-meta {
-  margin-top: 5px;
-  color: var(--muted);
-  font-size: 0.72rem;
-  line-height: 1.18;
+.chip-lock {
+  font-size: 0.85rem;
 }
 
-.level-meta strong {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+.logic-card {
+  padding: 24px;
 }
-
-.logic-card { padding: 24px; }
 
 .mission-header {
   display: flex;
   justify-content: space-between;
   gap: 16px;
   align-items: flex-start;
+
   margin-bottom: 18px;
 }
 
@@ -260,12 +298,16 @@ button:active { transform: translateY(0); }
   display: inline-flex;
   align-items: center;
   gap: 6px;
+
   padding: 7px 10px;
   border-radius: 999px;
+
   font-size: 0.82rem;
   font-weight: 800;
+
   background: rgba(6, 182, 212, 0.12);
   color: #0e7490;
+
   white-space: nowrap;
 }
 
@@ -278,7 +320,9 @@ button:active { transform: translateY(0); }
 .clues {
   display: grid;
   gap: 10px;
+
   margin: 20px 0;
+
   padding: 0;
   list-style: none;
 }
@@ -287,10 +331,13 @@ button:active { transform: translateY(0); }
   display: flex;
   gap: 10px;
   align-items: flex-start;
+
   padding: 12px 14px;
   border-radius: 16px;
+
   background: #f8fafc;
   border: 1px solid var(--border);
+
   color: #334155;
   line-height: 1.45;
 }
@@ -298,27 +345,36 @@ button:active { transform: translateY(0); }
 .clue-number {
   display: inline-grid;
   place-items: center;
+
   min-width: 26px;
   height: 26px;
+
   border-radius: 999px;
+
   color: #fff;
   background: var(--primary);
+
   font-weight: 900;
   font-size: 0.82rem;
 }
 
 .thinking-help {
   margin: 18px 0;
+
   display: grid;
   grid-template-columns: repeat(3, 1fr);
+
   gap: 12px;
 }
 
 .hint-card {
   padding: 14px;
+
   border: 1px solid var(--border);
   background: #fff;
+
   border-radius: 18px;
+
   color: var(--muted);
   line-height: 1.4;
   font-size: 0.92rem;
@@ -332,15 +388,17 @@ button:active { transform: translateY(0); }
 
 .table-wrap {
   overflow-x: auto;
+
   border-radius: 18px;
   border: 1px solid var(--border);
+
   background: #fff;
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 520px;
+  min-width: 720px;
 }
 
 th,
@@ -361,21 +419,30 @@ td:first-child {
   text-align: left;
   font-weight: 800;
   color: var(--text);
+
   position: sticky;
   left: 0;
+
   background: inherit;
 }
 
-tr:last-child td { border-bottom: 0; }
+tr:last-child td {
+  border-bottom: 0;
+}
 
 .cell-btn {
   width: 42px;
   height: 42px;
+
   padding: 0;
+
   border-radius: 14px;
+
   background: #eef2ff;
   color: #475569;
+
   font-size: 1.1rem;
+
   box-shadow: inset 0 0 0 1px rgba(79, 70, 229, 0.12);
 }
 
@@ -395,25 +462,36 @@ tr:last-child td { border-bottom: 0; }
 }
 
 @keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  50% { transform: translateX(3px); }
+  0%, 100% {
+    transform: translateX(0);
+  }
+
+  50% {
+    transform: translateX(3px);
+  }
 }
 
 .actions {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+
   margin-top: 18px;
 }
 
 .feedback {
   margin-top: 16px;
+
   padding: 14px 16px;
+
   border-radius: 18px;
   border: 1px solid var(--border);
+
   background: #f8fafc;
+
   color: #334155;
   line-height: 1.5;
+
   min-height: 52px;
 }
 
@@ -437,11 +515,16 @@ tr:last-child td { border-bottom: 0; }
 
 .checkpoint {
   margin-top: 14px;
+
   padding: 12px 14px;
+
   border-radius: 16px;
+
   background: #0f172a;
   color: #fff;
+
   display: none;
+
   line-height: 1.4;
 }
 
@@ -452,245 +535,15 @@ tr:last-child td { border-bottom: 0; }
 }
 
 @media (max-width: 900px) {
-  header.hero,
-  .layout { grid-template-columns: 1fr; }
-  .thinking-help { grid-template-columns: 1fr; }
-  .levels { grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); }
-  .level-card { min-height: 58px; padding: 8px; }
-  .level-meta { display: none; }
-}
-# ui.js compacto
-
-Sustituye completamente el contenido de tu archivo `js/ui.js` por esto:
-
-```javascript
-const DetectivesUI = {
-  nodes: {
-    levelsList: document.querySelector("#levelsList"),
-    gameArea: document.querySelector("#gameArea"),
-    progressText: document.querySelector("#progressText"),
-    progressFill: document.querySelector("#progressFill"),
-    codeInput: document.querySelector("#codeInput"),
-    codeButton: document.querySelector("#codeButton")
-  },
-
-  renderLevels({ levels, currentLevel, maxUnlocked, onLevelSelect }) {
-    this.nodes.levelsList.innerHTML = "";
-
-    levels.forEach(level => {
-      const unlocked = level.id <= maxUnlocked;
-      const card = document.createElement("button");
-
-      card.className = `level-chip ${level.id === currentLevel ? "active" : ""} ${unlocked ? "" : "locked"}`;
-
-      card.innerHTML = `
-        <span class="chip-number">${level.id}</span>
-        <span class="chip-lock">${unlocked ? "🔓" : "🔒"}</span>
-      `;
-
-      card.title = `${level.title} · ${level.type}`;
-
-      card.addEventListener("click", () => {
-        if (!unlocked) return;
-        onLevelSelect(level.id);
-      });
-
-      this.nodes.levelsList.appendChild(card);
-    });
-
-    this.nodes.progressText.textContent = `Nivel ${maxUnlocked} de ${levels.length} desbloqueado`;
-    this.nodes.progressFill.style.width = `${(maxUnlocked / levels.length) * 100}%`;
-  },
-
-  renderPlaceholder(level) {
-    this.nodes.gameArea.innerHTML = `
-      <div class="mission-header">
-        <div>
-          <span class="badge">🚧 Próximamente</span>
-          <h2>Nivel ${level.id}: ${level.title}</h2>
-          <p class="situation">
-            Este nivel todavía está en construcción.
-          </p>
-        </div>
-      </div>
-
-      <div class="feedback warning">
-        Este caso aún no está disponible.
-      </div>
-    `;
-  },
-
-  renderGame({ level, board, onCellClick, onCheck, onLogicCheck, onReset }) {
-    const clueItems = level.clues.map((clue, index) => `
-      <li><span class="clue-number">${index + 1}</span><span>${clue}</span></li>
-    `).join("");
-
-    const headerCells = level.cols.map((col, index) => {
-      const extraStyle = level.categoryBreaks?.includes(index)
-        ? "style='border-left: 4px solid #c7d2fe;'"
-        : "";
-
-      return `<th ${extraStyle}>${col}</th>`;
-    }).join("");
-
-    const bodyRows = level.rows.map(row => {
-      const cells = level.cols.map((col, index) => {
-        const extraStyle = level.categoryBreaks?.includes(index)
-          ? "style='border-left: 4px solid #c7d2fe;'"
-          : "";
-
-        return `
-          <td ${extraStyle}>
-            <button class="cell-btn" data-row="${row}" data-col="${col}" aria-label="${row} - ${col}">
-              ${DetectivesLogic.cellSymbols[board[row][col]]}
-            </button>
-          </td>
-        `;
-      }).join("");
-
-      return `<tr><td>${row}</td>${cells}</tr>`;
-    }).join("");
-
-    this.nodes.gameArea.innerHTML = `
-      <div class="mission-header">
-        <div>
-          <span class="badge">Caso ${level.id} · ${level.type}</span>
-          <h2>${level.title}</h2>
-          <p class="situation">${level.situation}</p>
-        </div>
-      </div>
-
-      <ul class="clues">${clueItems}</ul>
-
-      <div class="thinking-help" aria-label="Estrategia de resolución">
-        <div class="hint-card"><strong>1. Lee literal</strong>Marca primero solo lo seguro.</div>
-        <div class="hint-card"><strong>2. Descarta</strong>Usa las exclusiones para reducir opciones.</div>
-        <div class="hint-card"><strong>3. Comprueba</strong>Busca incoherencias antes de validar.</div>
-      </div>
-
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr><th>Detectives</th>${headerCells}</tr>
-          </thead>
-          <tbody>${bodyRows}</tbody>
-        </table>
-      </div>
-
-      <div class="actions">
-        <button class="btn-primary" id="checkButton" type="button">Comprobar hipótesis</button>
-        <button class="btn-ghost" id="logicButton" type="button">Buscar incoherencias</button>
-        <button class="btn-danger-soft" id="resetButton" type="button">Reiniciar caso</button>
-      </div>
-
-      <div class="feedback" id="feedback">
-        Marca cada casilla: pendiente ·, seguro ✅ o imposible ❌.
-      </div>
-
-      <div class="checkpoint" id="checkpointBox"></div>
-    `;
-
-    this.nodes.gameArea.querySelectorAll(".cell-btn").forEach(button => {
-      button.addEventListener("click", () => onCellClick(button));
-    });
-
-    this.nodes.gameArea.querySelector("#checkButton")?.addEventListener("click", onCheck);
-    this.nodes.gameArea.querySelector("#logicButton")?.addEventListener("click", onLogicCheck);
-    this.nodes.gameArea.querySelector("#resetButton")?.addEventListener("click", onReset);
-  },
-
-  updateCell(button, value) {
-    button.textContent = DetectivesLogic.cellSymbols[value];
-    button.classList.remove("yes", "no", "error");
-
-    if (value === "yes") button.classList.add("yes");
-    if (value === "no") button.classList.add("no");
-  },
-
-  setFeedback(kind, message) {
-    const feedback = this.nodes.gameArea.querySelector("#feedback");
-    if (!feedback) return;
-
-    feedback.className = `feedback ${kind || ""}`;
-    feedback.innerHTML = message;
-  },
-
-  clearErrors() {
-    this.nodes.gameArea.querySelectorAll(".cell-btn").forEach(button => {
-      button.classList.remove("error");
-    });
-  },
-
-  markErrors(errors) {
-    this.clearErrors();
-
-    errors.forEach(error => {
-      const selector = `.cell-btn[data-row="${this.cssEscape(error.row)}"][data-col="${this.cssEscape(error.col)}"]`;
-      const button = this.nodes.gameArea.querySelector(selector);
-
-      if (button) button.classList.add("error");
-    });
-  },
-
-  showCheckpoint(level) {
-    const checkpointBox = this.nodes.gameArea.querySelector("#checkpointBox");
-
-    if (!checkpointBox || !level.checkpoint) return;
-
-    checkpointBox.style.display = "block";
-    checkpointBox.innerHTML = `Código desbloqueado: <code>${level.checkpoint}</code>`;
-  },
-
-  cssEscape(value) {
-    if (window.CSS && typeof window.CSS.escape === "function") {
-      return CSS.escape(value);
-    }
-
-    return String(value).replace(/"/g, '\\"');
+  header.hero {
+    grid-template-columns: 1fr;
   }
-};
-```
 
-Y añade también esto al final de tu `styles.css`:
+  .thinking-help {
+    grid-template-columns: 1fr;
+  }
 
-```css
-.layout {
-  grid-template-columns: 1fr;
+  table {
+    min-width: 560px;
+  }
 }
-
-.panel {
-  padding: 16px;
-}
-
-.levels {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(64px, 1fr));
-  gap: 10px;
-}
-
-.level-chip {
-  border: 1px solid var(--border);
-  background: white;
-  border-radius: 16px;
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  font-weight: 800;
-  min-height: 72px;
-}
-
-.level-chip.active {
-  border-color: var(--primary);
-  background: rgba(79, 70, 229, 0.08);
-}
-
-.level-chip.locked {
-  opacity: 0.45;
-}
-
-.chip-number {
-  font-size: 1.1rem;
-}
-```
