@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Crackea el código</title>
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+<header>
+<h2>🔐 Crackea el código</h2>
+<p>Deducción lógica, hipótesis, patrones y descarte de posibilidades.</p>
+</header>
+<main>
+<section>
+<h3>Crackea el código</h3>
+<p>Elige una dificultad. Cada símbolo tiene un valor secreto. Prueba combinaciones y usa las pistas para deducir el código.</p>
+<div class="notice"><strong>Objetivo:</strong> encontrar el código exacto. Esto trabaja ensayo sistemático, descarte de posibilidades, patrones y depuración de hipótesis.</div>
+<label>Dificultad:</label>
+<select id="difficulty" onchange="newCrackGame()">
+<option value="easy">Fácil: 3 símbolos</option>
+<option value="medium">Media: 4 símbolos</option>
+<option value="hard">Difícil: 4 símbolos con repetición</option>
+</select>
+<button onclick="newCrackGame()">Nuevo código</button>
+<h4>Construye tu intento</h4>
+<div id="symbolPalette"></div>
+<p><strong>Intento:</strong> <span id="currentGuess">—</span></p>
+<button onclick="deleteGuessSymbol()">Borrar último</button>
+<button onclick="checkGuess()">Probar intento</button>
+<p id="crackResult"></p>
+<div id="crackCheckpointBox" class="checkpoint" style="display:none"></div>
+</section>
+<section>
+<h3>Pistas</h3>
+<div class="notice" id="crackRules"></div>
+<h3>Historial</h3>
+<div id="attempts"></div>
+</section>
+</main>
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
