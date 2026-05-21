@@ -15,7 +15,8 @@ const DetectivesUI = {
       const unlocked = level.id <= maxUnlocked;
       const card = document.createElement("button");
 
-      card.className = `level-chip ${level.id === currentLevel ? "active" : ""} ${unlocked ? "" : "locked"}`;
+      card.className =
+        `level-chip ${level.id === currentLevel ? "active" : ""} ${unlocked ? "" : "locked"}`;
 
       card.innerHTML = `
         <span class="chip-number">${level.id}</span>
@@ -32,8 +33,11 @@ const DetectivesUI = {
       this.nodes.levelsList.appendChild(card);
     });
 
-    this.nodes.progressText.textContent = `Nivel ${maxUnlocked} de ${levels.length} desbloqueado`;
-    this.nodes.progressFill.style.width = `${(maxUnlocked / levels.length) * 100}%`;
+    this.nodes.progressText.textContent =
+      `Nivel ${maxUnlocked} de ${levels.length} desbloqueado`;
+
+    this.nodes.progressFill.style.width =
+      `${(maxUnlocked / levels.length) * 100}%`;
   },
 
   renderPlaceholder(level) {
@@ -41,7 +45,11 @@ const DetectivesUI = {
       <div class="mission-header">
         <div>
           <span class="badge">🚧 Próximamente</span>
-          <h2>Nivel ${level.id}: ${level.title}</h2>
+
+          <h2>
+            Nivel ${level.id}: ${level.title}
+          </h2>
+
           <p class="situation">
             Este nivel todavía está en construcción.
           </p>
@@ -54,176 +62,275 @@ const DetectivesUI = {
     `;
   },
 
-  renderGame({ level, board, onCellClick, onCheck, onLogicCheck, onReset }) {
+  renderGame({
+    level,
+    board,
+    onCellClick,
+    onCheck,
+    onLogicCheck,
+    onReset
+  }) {
+
     const clueItems = level.clues.map((clue, index) => `
-      <li><span class="clue-number">${index + 1}</span><span>${clue}</span></li>
+      <li>
+        <span class="clue-number">${index + 1}</span>
+        <span>${clue}</span>
+      </li>
     `).join("");
 
     const headerCells = level.cols.map((col, index) => {
-      const extraStyle = level.categoryBreaks?.includes(index)
-        ? "style='border-left: 4px solid #c7d2fe;'"
-        : "";
 
-      return `<th ${extraStyle}>${col}</th>`;
-    }).join("");
-
-    const bodyRows = level.rows.map(row => {
-      const cells = level.cols.map((col, index) => {
-        const extraStyle = level.categoryBreaks?.includes(index)
+      const extraStyle =
+        level.categoryBreaks?.includes(index)
           ? "style='border-left: 4px solid #c7d2fe;'"
           : "";
 
+      return `<th ${extraStyle}>${col}</th>`;
+
+    }).join("");
+
+    const bodyRows = level.rows.map(row => {
+
+      const cells = level.cols.map((col, index) => {
+
+        const extraStyle =
+          level.categoryBreaks?.includes(index)
+            ? "style='border-left: 4px solid #c7d2fe;'"
+            : "";
+
         return `
           <td ${extraStyle}>
-            <button class="cell-btn" data-row="${row}" data-col="${col}" aria-label="${row} - ${col}">
+            <button
+              class="cell-btn"
+              data-row="${row}"
+              data-col="${col}"
+              aria-label="${row} - ${col}"
+            >
               ${DetectivesLogic.cellSymbols[board[row][col]]}
             </button>
           </td>
         `;
+
       }).join("");
 
-      return `<tr><td>${row}</td>${cells}</tr>`;
+      return `
+        <tr>
+          <td>${row}</td>
+          ${cells}
+        </tr>
+      `;
+
     }).join("");
 
     this.nodes.gameArea.innerHTML = `
       <div class="mission-header">
+
         <div>
-          <span class="badge">Caso ${level.id} · ${level.type}</span>
+
+          <span class="badge">
+            Caso ${level.id} · ${level.type}
+          </span>
+
           <h2>${level.title}</h2>
-          <p class="situation">${level.situation}</p>
+
+          <p class="situation">
+            ${level.situation}
+          </p>
+
         </div>
+
       </div>
 
-      <ul class="clues">${clueItems}</ul>
+      <ul class="clues">
+        ${clueItems}
+      </ul>
 
-      <div class="thinking-help" aria-label="Estrategia de resolución">
-        <div class="hint-card"><strong>1. Lee literal</strong>Marca primero solo lo seguro.</div>
-        <div class="hint-card"><strong>2. Descarta</strong>Usa las exclusiones para reducir opciones.</div>
-        <div class="hint-card"><strong>3. Comprueba</strong>Busca incoherencias antes de validar.</div>
+      <div class="thinking-help">
+
+        <div class="hint-card">
+          <strong>1. Lee literal</strong>
+          Marca primero solo lo seguro.
+        </div>
+
+        <div class="hint-card">
+          <strong>2. Descarta</strong>
+          Usa exclusiones para reducir opciones.
+        </div>
+
+        <div class="hint-card">
+          <strong>3. Comprueba</strong>
+          Busca incoherencias antes de validar.
+        </div>
+
       </div>
 
       <div class="table-wrap">
+
         <table>
+
           <thead>
-            <tr><th>Detectives</th>${headerCells}</tr>
+            <tr>
+              <th>Detectives</th>
+              ${headerCells}
+            </tr>
           </thead>
-          <tbody>${bodyRows}</tbody>
+
+          <tbody>
+            ${bodyRows}
+          </tbody>
+
         </table>
+
       </div>
 
       <div class="actions">
-        <button class="btn-primary" id="checkButton" type="button">Comprobar hipótesis</button>
-        <button class="btn-ghost" id="logicButton" type="button">Buscar incoherencias</button>
-        <button class="btn-danger-soft" id="resetButton" type="button">Reiniciar caso</button>
+
+        <button
+          class="btn-primary"
+          id="checkButton"
+          type="button"
+        >
+          Comprobar hipótesis
+        </button>
+
+        <button
+          class="btn-ghost"
+          id="logicButton"
+          type="button"
+        >
+          Buscar incoherencias
+        </button>
+
+        <button
+          class="btn-danger-soft"
+          id="resetButton"
+          type="button"
+        >
+          Reiniciar caso
+        </button>
+
       </div>
 
       <div class="feedback" id="feedback">
-        Marca cada casilla: pendiente ·, seguro ✅ o imposible ❌.
+        Marca cada casilla:
+        pendiente ·,
+        seguro ✅
+        o imposible ❌.
       </div>
 
       <div class="checkpoint" id="checkpointBox"></div>
     `;
 
-    this.nodes.gameArea.querySelectorAll(".cell-btn").forEach(button => {
-      button.addEventListener("click", () => onCellClick(button));
-    });
+    this.nodes.gameArea
+      .querySelectorAll(".cell-btn")
+      .forEach(button => {
 
-    this.nodes.gameArea.querySelector("#checkButton")?.addEventListener("click", onCheck);
-    this.nodes.gameArea.querySelector("#logicButton")?.addEventListener("click", onLogicCheck);
-    this.nodes.gameArea.querySelector("#resetButton")?.addEventListener("click", onReset);
+        button.addEventListener("click", () => {
+          onCellClick(button);
+        });
+
+      });
+
+    this.nodes.gameArea
+      .querySelector("#checkButton")
+      ?.addEventListener("click", onCheck);
+
+    this.nodes.gameArea
+      .querySelector("#logicButton")
+      ?.addEventListener("click", onLogicCheck);
+
+    this.nodes.gameArea
+      .querySelector("#resetButton")
+      ?.addEventListener("click", onReset);
   },
 
   updateCell(button, value) {
-    button.textContent = DetectivesLogic.cellSymbols[value];
-    button.classList.remove("yes", "no", "error");
 
-    if (value === "yes") button.classList.add("yes");
-    if (value === "no") button.classList.add("no");
+    button.textContent =
+      DetectivesLogic.cellSymbols[value];
+
+    button.classList.remove(
+      "yes",
+      "no",
+      "error"
+    );
+
+    if (value === "yes") {
+      button.classList.add("yes");
+    }
+
+    if (value === "no") {
+      button.classList.add("no");
+    }
   },
 
   setFeedback(kind, message) {
-    const feedback = this.nodes.gameArea.querySelector("#feedback");
+
+    const feedback =
+      this.nodes.gameArea.querySelector("#feedback");
+
     if (!feedback) return;
 
-    feedback.className = `feedback ${kind || ""}`;
+    feedback.className =
+      `feedback ${kind || ""}`;
+
     feedback.innerHTML = message;
   },
 
   clearErrors() {
-    this.nodes.gameArea.querySelectorAll(".cell-btn").forEach(button => {
-      button.classList.remove("error");
-    });
+
+    this.nodes.gameArea
+      .querySelectorAll(".cell-btn")
+      .forEach(button => {
+
+        button.classList.remove("error");
+
+      });
   },
 
   markErrors(errors) {
+
     this.clearErrors();
 
     errors.forEach(error => {
-      const selector = `.cell-btn[data-row="${this.cssEscape(error.row)}"][data-col="${this.cssEscape(error.col)}"]`;
-      const button = this.nodes.gameArea.querySelector(selector);
 
-      if (button) button.classList.add("error");
+      const selector =
+        `.cell-btn[data-row="${this.cssEscape(error.row)}"][data-col="${this.cssEscape(error.col)}"]`;
+
+      const button =
+        this.nodes.gameArea.querySelector(selector);
+
+      if (button) {
+        button.classList.add("error");
+      }
+
     });
   },
 
   showCheckpoint(level) {
-    const checkpointBox = this.nodes.gameArea.querySelector("#checkpointBox");
 
-    if (!checkpointBox || !level.checkpoint) return;
+    const checkpointBox =
+      this.nodes.gameArea.querySelector("#checkpointBox");
+
+    if (!checkpointBox || !level.checkpoint) {
+      return;
+    }
 
     checkpointBox.style.display = "block";
-    checkpointBox.innerHTML = `Código desbloqueado: <code>${level.checkpoint}</code>`;
+
+    checkpointBox.innerHTML =
+      `Código desbloqueado: <code>${level.checkpoint}</code>`;
   },
 
   cssEscape(value) {
-    if (window.CSS && typeof window.CSS.escape === "function") {
+
+    if (
+      window.CSS &&
+      typeof window.CSS.escape === "function"
+    ) {
       return CSS.escape(value);
     }
 
     return String(value).replace(/"/g, '\\"');
   }
-};
-```
-
-Y añade también esto al final de tu `styles.css`:
-
-```css
-.layout {
-  grid-template-columns: 1fr;
-}
-
-.panel {
-  padding: 16px;
-}
-
-.levels {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(64px, 1fr));
-  gap: 10px;
-}
-
-.level-chip {
-  border: 1px solid var(--border);
-  background: white;
-  border-radius: 16px;
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  font-weight: 800;
-  min-height: 72px;
-}
-
-.level-chip.active {
-  border-color: var(--primary);
-  background: rgba(79, 70, 229, 0.08);
-}
-
-.level-chip.locked {
-  opacity: 0.45;
-}
-
-.chip-number {
-  font-size: 1.1rem;
 };
