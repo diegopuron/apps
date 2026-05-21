@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ScratchLab | Misiones robot</title>
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+<header>
+<h2>🤖 ScratchLab | Misiones robot</h2>
+<p>Piensa → Programa → Comprueba → Depura</p>
+</header>
+<main>
+<section>
+<h3 id="missionTitle">Misión 1</h3>
+<p id="missionText">Llega a la estrella.</p>
+<div class="notice">Antes de ejecutar, explica tu plan y construye tu programa. Después avisa al profe para desbloquear la ejecución.</div>
+<div class="keybox">
+<strong>¿Ya tienes un código de progreso?</strong><br>
+Escríbelo para continuar desde un checkpoint sin repetir todo desde el principio.<br>
+<input id="progressCode" type="text" placeholder="Ej: PLANIFICA" />
+<button onclick="useProgressCode()">Usar código</button>
+<p id="progressResult"></p>
+</div>
+<div id="checkpointBox" class="checkpoint" style="display:none"></div>
+<h3>1. Explica tu plan</h3>
+<textarea id="plan" placeholder="Ejemplo: Primero avanzo... después giro..."></textarea>
+<button onclick="validatePlan()">Validar explicación</button>
+<p id="planResult"></p>
+<h3>2. Programa</h3>
+<div class="block-list">
+<button onclick="addBlock('move')">Avanzar</button>
+<button onclick="addBlock('left')">Girar izq</button>
+<button onclick="addBlock('right')">Girar der</button>
+<button onclick="addBlock('repeat')">Repetir anterior</button>
+</div>
+<div id="program">Todavía no hay bloques.</div>
+<button onclick="clearProgram()">Borrar programa</button>
+<h3>3. Revisa</h3>
+<button onclick="checkCoherence()">Comprobar coherencia</button>
+<p id="result"></p>
+<h3>4. Validación del profe</h3>
+<button onclick="askTeacher()">Avisa a tu profe</button>
+<div id="teacherBox" class="teacher" style="display:none">
+<strong>Revisión rápida del profe</strong>
+<p id="teacherSummary"></p>
+<input id="teacherCode" type="password" placeholder="Código del profe" />
+<button onclick="unlockRun()">Desbloquear ejecución</button>
+<p id="unlockResult"></p>
+</div>
+<h3>5. Ejecuta</h3>
+<button id="runBtn" onclick="runProgram()" disabled>Ejecutar misión</button>
+<button id="nextBtn" onclick="nextMission()" disabled>Siguiente misión</button>
+</section>
+<section class="board-panel">
+<h3>Tablero</h3>
+<div id="grid" class="grid"></div>
+<div class="notice"><strong>Cómo se mueve el robot:</strong><br>Avanzar mueve una casilla en la dirección de la flecha. Girar cambia la dirección, pero no cambia de casilla. Las rocas no se pueden atravesar.</div>
+<div class="notice"><strong>Ejecución rápida</strong><br><button id="runBtnBoard" onclick="runProgram()" disabled>Ejecutar misión</button><button id="nextBtnBoard" onclick="nextMission()" disabled>Siguiente misión</button></div>
+</section>
+</main>
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
