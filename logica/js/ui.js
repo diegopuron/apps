@@ -1,8 +1,3 @@
-# ui.js compacto
-
-Sustituye completamente el contenido de tu archivo `js/ui.js` por esto:
-
-```javascript
 const DetectivesUI = {
   nodes: {
     levelsList: document.querySelector("#levelsList"),
@@ -231,5 +226,4 @@ Y añade también esto al final de tu `styles.css`:
 
 .chip-number {
   font-size: 1.1rem;
-}
-```
+};
