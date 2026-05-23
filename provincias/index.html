@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Provincias de España | Apps educativas</title>
+  <link rel="icon" href="../assets/Logofinal.png">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <img src="../assets/Logofinal.png" alt="Logotipo de Diego Purón" class="brand-logo" onerror="this.style.display='none'">
+      <div>
+        <p class="eyebrow">Laboratorio educativo</p>
+        <h1>🗺️ Provincias de España</h1>
+        <p class="subtitle">Localiza provincias en el mapa, usa pistas por comunidades autónomas y entrena memoria visual y orientación espacial.</p>
+      </div>
+    </div>
+    <div class="score" aria-label="Marcador">
+      <span class="chip">Puntos <strong id="uiPuntos">0</strong></span>
+      <span class="chip">Racha <strong id="uiRacha">0</strong></span>
+      <span class="chip">Mejor <strong id="uiBest">0</strong></span>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="card panel" aria-labelledby="panelJuego">
+      <div class="section-label">Geografía visual</div>
+      <h2 id="panelJuego">Panel de juego</h2>
+
+      <div class="controls">
+        <label>
+          <span>Modo</span>
+          <select id="modo" aria-label="Modo de juego">
+            <option value="clasico">Clásico (10 preguntas)</option>
+            <option value="contrarreloj">Contrarreloj (60 s)</option>
+            <option value="endless">Endless</option>
+          </select>
+        </label>
+        <label>
+          <span>Rondas</span>
+          <input id="rondas" type="number" min="5" max="50" value="10" aria-label="Número de rondas">
+        </label>
+      </div>
+
+      <div class="button-row">
+        <button class="btn primary" id="btnJugar">▶️ Empezar</button>
+        <button class="btn" id="btnPista">💡 Pista</button>
+        <button class="btn" id="btnMapaLibre">🗺️ Mapa libre</button>
+        <button class="btn ghost" id="btnReiniciar">↺ Reiniciar</button>
+      </div>
+
+      <div class="question-card">
+        <p class="mini-title">Pregunta actual</p>
+        <div class="question" id="pregunta">Cargando…</div>
+        <div id="pista" class="hint"></div>
+        <div class="meta-row">
+          <div>Quedan: <strong id="uiQuedan">—</strong></div>
+          <div class="timer" id="uiTiempo">—</div>
+        </div>
+        <div class="status" id="estado"></div>
+      </div>
+
+      <h3 class="province-title">📋 Provincias <small>pasa el cursor para verlas en el mapa</small></h3>
+      <div id="listaProvincias" class="grid"></div>
+      <div class="license">🗺️ Mapa base: Wikimedia Commons — “Provinces of Spain, blank map”. Licencia CC BY-SA 4.0.</div>
+    </section>
+
+    <section class="card map-card" aria-label="Mapa de provincias">
+      <div class="map-head">
+        <div>
+          <div class="section-label">Mapa interactivo</div>
+          <h2>España por provincias</h2>
+        </div>
+        <a class="home-link" href="../">← Apps</a>
+      </div>
+      <div class="map-wrap">
+        <div id="svgHost" class="svg-host"></div>
+      </div>
+    </section>
+  </main>
+
+  <div id="tt" class="tooltip"></div>
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>
