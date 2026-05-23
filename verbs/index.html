@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VerbMaster – Juegos verbales</title>
+<link rel="stylesheet" href="shared/styles.css">
+<style>
+.home-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:18px}
+.home-link{text-decoration:none;color:inherit;display:block}
+.home-card{height:100%;transition:transform .18s,box-shadow .18s,border-color .18s}
+.home-card:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:var(--primary)}
+.home-icon{font-size:2.4rem;margin-bottom:8px}
+.home-title{font-size:1.25rem;font-weight:900;color:var(--primary);margin-bottom:8px}
+.home-text{color:var(--text2);font-size:.92rem}
+</style>
+</head>
+<body>
+<header>
+  <a class="logo" href="index.html">
+    <span class="logo-icon">🎓</span>
+    <div>Verb<span class="logo-em">Master</span><span class="logo-tagline">morfología verbal española</span></div>
+  </a>
+  <div class="header-right"><button class="icon-btn" id="themeBtn" title="Cambiar tema claro/oscuro">🌙</button></div>
+</header>
+<div class="main">
+  <div class="card">
+    <div class="card-title">Elige juego</div>
+    <p class="text-muted">Los dos juegos son independientes, pero comparten la misma base de verbos y la misma lógica de conjugación.</p>
+  </div>
+  <div class="home-grid">
+    <a class="home-link" href="generador/">
+      <div class="card home-card">
+        <div class="home-icon">🎰</div>
+        <div class="home-title">Generador de formas verbales</div>
+        <p class="home-text">Ruletas de persona, modo, tiempo y verbo. Ideal para práctica oral o rápida en clase.</p>
+      </div>
+    </a>
+    <a class="home-link" href="analisis/">
+      <div class="card home-card">
+        <div class="home-icon">🔍</div>
+        <div class="home-title">Análisis morfológico</div>
+        <p class="home-text">Modo reflexión y modo interactivo para analizar infinitivo, persona, número, modo, tiempo y tipo.</p>
+      </div>
+    </a>
+  </div>
+</div>
+<script src="shared/core.js"></script>
+</body>
+</html>
