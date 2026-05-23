@@ -679,20 +679,7 @@ details.help-box{background:var(--surface);border-color:var(--border);border-rad
   .main{padding-top:18px}
   .app-hero{padding:24px 20px;border-radius:24px}
 }
-.back-btn{
-  display:inline-block;
-  margin:16px;
-  padding:10px 16px;
-  border-radius:12px;
-  background:#263238;
-  color:white;
-  text-decoration:none;
-  font-weight:700;
-  box-shadow:0 3px 8px rgba(0,0,0,.18);
-  transition:.2s;
-}
 
-.back-btn:hover{
-  opacity:.9;
-  transform:translateY(-2px);
-}
+/* VERBMASTER · RUTA DE ANÁLISIS POR NIVELES */
+.mission-panel{border-width:2px}.mission-head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;flex-wrap:wrap}.mission-head h2{font-size:1.45rem;line-height:1.2;margin-bottom:6px;color:var(--text)}.mission-code-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.level-strip{display:flex;gap:7px;overflow-x:auto;padding:12px 0 4px;margin-top:10px;scrollbar-width:thin}.level-pill{border:2px solid var(--border);background:var(--surface2);color:var(--text2);border-radius:999px;padding:7px 12px;font-weight:800;font-size:.78rem;white-space:nowrap;transition:all .18s}.level-pill:not(.locked):hover{border-color:var(--primary);color:var(--primary);transform:translateY(-1px)}.level-pill.active{background:linear-gradient(135deg,var(--primary),var(--primary2));border-color:transparent;color:#fff;box-shadow:0 4px 16px rgba(79,47,200,.28)}.level-pill.locked{opacity:.46;cursor:not-allowed}.progress-wrap{margin-top:14px}.progress-label{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:.82rem;font-weight:800;color:var(--text2);margin-bottom:7px}.progress-track{height:12px;border-radius:999px;background:var(--bg2);border:1px solid var(--border);overflow:hidden}.progress-fill{height:100%;width:0%;border-radius:999px;background:linear-gradient(90deg,var(--accent3),var(--accent4));transition:width .35s ease}.compact-options details summary,.teacher-card details summary{cursor:pointer;font-weight:800;color:var(--primary);list-style:none}.compact-options details summary::-webkit-details-marker,.teacher-card details summary::-webkit-details-marker{display:none}.options-inner{margin-top:14px}.options-note{margin-top:10px}.exercise-card{padding:24px}.teacher-levels{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.session-summary{margin:18px 0}.summary-card{background:var(--surface);border:2px solid var(--primary);border-radius:24px;padding:24px;box-shadow:var(--shadow);animation:slideUp .28s ease forwards}.summary-card h2{text-align:center;margin-bottom:14px}.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:14px 0}.summary-grid div{background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:12px;text-align:center}.summary-grid strong{display:block;color:var(--text2);font-size:.68rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}.summary-grid span{font-weight:900;font-size:1.05rem}.code-box{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:clamp(1.05rem,3.4vw,1.55rem);font-weight:900;text-align:center;letter-spacing:1.2px;background:var(--bg2);border:2px dashed var(--primary);border-radius:16px;padding:16px;margin:16px 0;word-break:break-word}.code-input-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:14px}.code-input{flex:1;min-width:230px;max-width:430px;padding:12px 14px;border:2px solid var(--border);border-radius:14px;background:var(--bg);color:var(--text);font:800 1rem ui-monospace,SFMono-Regular,Consolas,monospace;text-transform:uppercase}.code-input:focus{outline:none;border-color:var(--primary)}
+@media(max-width:620px){.mission-head{display:block}.mission-code-actions{justify-content:flex-start;margin-top:12px}.exercise-card{padding:18px}.level-strip{padding-bottom:8px}}@media print{header,.app-hero,.mission-panel,.compact-options,.exercise-card,.teacher-card,.help-box,.footer-note{display:none!important}.session-summary{display:block!important}.summary-card{box-shadow:none;border:2px solid #000;color:#000}.code-box{border-color:#000}}
