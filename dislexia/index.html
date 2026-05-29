@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Laboratorio de la Lectura</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      background: #f4f6fb;
+      color: #1f2937;
+      line-height: 1.6;
+    }
+
+    header {
+      background: #243b53;
+      color: white;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    main {
+      max-width: 900px;
+      margin: auto;
+      padding: 2rem;
+    }
+
+    section {
+      background: white;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      border-radius: 14px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    h1, h2 {
+      margin-top: 0;
+    }
+
+    .warning {
+      background: #fff7ed;
+      border-left: 6px solid #f97316;
+    }
+
+    .texto {
+      font-size: 1.25rem;
+      background: #f8fafc;
+      padding: 1.5rem;
+      border-radius: 12px;
+      min-height: 220px;
+    }
+
+    button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 0.8rem 1.2rem;
+      border-radius: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+      margin: 0.3rem;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    button.secondary {
+      background: #64748b;
+    }
+
+    button.danger {
+      background: #dc2626;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .question {
+      margin-bottom: 1rem;
+    }
+
+    label {
+      display: block;
+      margin: 0.25rem 0;
+    }
+
+    input[type="text"], textarea {
+      width: 100%;
+      padding: 0.8rem;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      font-size: 1rem;
+    }
+
+    .result {
+      font-size: 1.1rem;
+      background: #ecfdf5;
+      border-left: 6px solid #22c55e;
+    }
+
+    .reflection {
+      background: #eef2ff;
+      border-left: 6px solid #6366f1;
+    }
+
+    .small {
+      font-size: 0.9rem;
+      color: #475569;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>Laboratorio de la Lectura</h1>
+  <p>Una experiencia para reflexionar sobre barreras lectoras y apoyos inclusivos</p>
+</header>
+
+<main>
+
+  <section class="warning" id="inicio">
+    <h2>Antes de empezar</h2>
+    <p>
+      Esta actividad <strong>no reproduce exactamente lo que vive una persona con dislexia</strong>.
+      La dislexia es una dificultad específica del aprendizaje mucho más compleja.
+    </p>
+    <p>
+      Esta simulación solo pretende ayudar a experimentar, de forma limitada, cómo una dificultad
+      lectora puede aumentar el esfuerzo, el cansancio y los errores de comprensión.
+    </p>
+    <button onclick="empezar()">Comenzar experiencia</button>
+  </section>
+
+  <section id="fase" class="hidden">
+    <h2 id="tituloFase"></h2>
+    <p id="descripcionFase"></p>
+
+    <div class="texto" id="textoLectura"></div>
+
+    <p class="small">
+      Cuando termines de leer, pulsa el botón. Después responderás unas preguntas de comprensión.
+    </p>
+
+    <button onclick="terminarLectura()">He terminado de leer</button>
+  </section>
+
+  <section id="preguntas" class="hidden">
+    <h2>Preguntas de comprensión</h2>
+
+    <div id="contenedorPreguntas"></div>
+
+    <button onclick="corregir()">Corregir respuestas</button>
+  </section>
+
+  <section id="resultado" class="hidden result">
+    <h2>Resultado de esta fase</h2>
+    <p id="resultadoTexto"></p>
+    <button onclick="siguienteFase()">Continuar</button>
+  </section>
+
+  <section id="informe" class="hidden reflection">
+    <h2>Informe final</h2>
+    <div id="informeFinal"></div>
+
+    <h3>Reflexión final</h3>
+    <p>
+      Responde por escrito o comentad en grupo:
+    </p>
+    <ul>
+      <li>¿Qué fase te resultó más difícil?</li>
+      <li>¿Qué sentiste al leer con más dificultad?</li>
+      <li>¿Qué ayudas podrían facilitar la lectura a una persona con dificultades lectoras?</li>
+    </ul>
+
+    <textarea rows="5" placeholder="Escribe aquí tu reflexión..."></textarea>
+
+    <br><br>
+    <button onclick="reiniciar()" class="secondary">Reiniciar experiencia</button>
+  </section>
+
+</main>
+
+<script>
+const textoOriginal = `
+El sábado por la mañana, Marta salió de casa para visitar a sus abuelos.
+Hacía buen tiempo y decidió ir caminando por el parque. Mientras avanzaba por el sendero,
+observó a varias personas paseando a sus perros, algunos niños jugando al balón y un grupo
+de ciclistas que recorría los caminos cercanos.
+
+Al llegar a la plaza principal se encontró con una pequeña feria de libros.
+Había puestos de muchas temáticas diferentes: aventuras, ciencia, historia y cuentos ilustrados
+para los más pequeños. Marta se detuvo en uno de los puestos y hojeó varios ejemplares antes
+de decidir cuál comprar.
+
+Después continuó su camino hasta la casa de sus abuelos. Allí compartieron la comida,
+hablaron sobre las vacaciones de verano y recordaron algunas anécdotas familiares.
+Antes de regresar a casa, Marta ayudó a su abuelo a ordenar unas herramientas en el garaje
+y a regar las plantas del jardín.
+
+Cuando volvió a casa por la tarde estaba cansada, pero muy contenta. Había pasado un día
+agradable, había descubierto un libro interesante y había disfrutado de la compañía de su familia.
+`;
+
+const preguntas = [
+  {
+    texto: "¿A quién fue a visitar Marta?",
+    opciones: ["A sus primos", "A sus abuelos", "A sus vecinos"],
+    correcta: 1
+  },
+  {
+    texto: "¿Por dónde decidió ir caminando?",
+    opciones: ["Por el parque", "Por la playa", "Por una carretera"],
+    correcta: 0
+  },
+  {
+    texto: "¿Qué encontró en la plaza principal?",
+    opciones: ["Un mercado de ropa", "Una feria de libros", "Un concierto"],
+    correcta: 1
+  },
+  {
+    texto: "¿Qué ayudó a ordenar Marta?",
+    opciones: ["Unas herramientas", "Unos libros", "Unos juguetes"],
+    correcta: 0
+  },
+  {
+    texto: "¿Cómo se sentía Marta al volver a casa?",
+    opciones: ["Cansada pero contenta", "Enfadada y triste", "Aburrida"],
+    correcta: 0
+  }
+];
+
+const fases = [
+  {
+    titulo: "Fase 1: lectura habitual",
+    descripcion: "Lee el texto con normalidad. Esta será la referencia para comparar después.",
+    intensidad: 0
+  },
+  {
+    titulo: "Fase 2: lectura con pequeñas alteraciones",
+    descripcion: "Algunas letras aparecerán cambiadas. Intenta leer y comprender el texto.",
+    intensidad: 0.18
+  },
+  {
+    titulo: "Fase 3: lectura con mayor dificultad",
+    descripcion: "Las alteraciones serán más frecuentes. Observa si necesitas más tiempo o más esfuerzo.",
+    intensidad: 0.34
+  }
+];
+
+let faseActual = 0;
+let inicioTiempo = 0;
+let resultados = [];
+
+function empezar() {
+  document.getElementById("inicio").classList.add("hidden");
+  cargarFase();
+}
+
+function cargarFase() {
+  document.getElementById("fase").classList.remove("hidden");
+  document.getElementById("preguntas").classList.add("hidden");
+  document.getElementById("resultado").classList.add("hidden");
+
+  const fase = fases[faseActual];
+
+  document.getElementById("tituloFase").innerText = fase.titulo;
+  document.getElementById("descripcionFase").innerText = fase.descripcion;
+  document.getElementById("textoLectura").innerText = alterarTexto(textoOriginal, fase.intensidad);
+
+  inicioTiempo = Date.now();
+}
+
+function alterarTexto(texto, intensidad) {
+  if (intensidad === 0) return texto;
+
+  return texto.split(/\b/).map(fragmento => {
+    if (/^[a-záéíóúñü]+$/i.test(fragmento) && Math.random() < intensidad) {
+      return alterarPalabra(fragmento);
+    }
+    return fragmento;
+  }).join("");
+}
+
+function alterarPalabra(palabra) {
+  if (palabra.length <= 3) return palabra;
+
+  let letras = palabra.split("");
+  let posicion = Math.floor(Math.random() * (letras.length - 2)) + 1;
+
+  let temp = letras[posicion];
+  letras[posicion] = letras[posicion + 1];
+  letras[posicion + 1] = temp;
+
+  return letras.join("");
+}
+
+function terminarLectura() {
+  document.getElementById("fase").classList.add("hidden");
+  mostrarPreguntas();
+}
+
+function mostrarPreguntas() {
+  const contenedor = document.getElementById("contenedorPreguntas");
+  contenedor.innerHTML = "";
+
+  preguntas.forEach((pregunta, i) => {
+    const div = document.createElement("div");
+    div.className = "question";
+
+    div.innerHTML = `<p><strong>${i + 1}. ${pregunta.texto}</strong></p>`;
+
+    pregunta.opciones.forEach((opcion, j) => {
+      div.innerHTML += `
+        <label>
+          <input type="radio" name="pregunta${i}" value="${j}">
+          ${opcion}
+        </label>
+      `;
+    });
+
+    contenedor.appendChild(div);
+  });
+
+  document.getElementById("preguntas").classList.remove("hidden");
+}
+
+function corregir() {
+  let aciertos = 0;
+
+  preguntas.forEach((pregunta, i) => {
+    const seleccionada = document.querySelector(`input[name="pregunta${i}"]:checked`);
+    if (seleccionada && Number(seleccionada.value) === pregunta.correcta) {
+      aciertos++;
+    }
+  });
+
+  const tiempoSegundos = Math.round((Date.now() - inicioTiempo) / 1000);
+
+  resultados.push({
+    fase: fases[faseActual].titulo,
+    aciertos,
+    total: preguntas.length,
+    tiempo: tiempoSegundos
+  });
+
+  document.getElementById("preguntas").classList.add("hidden");
+  document.getElementById("resultado").classList.remove("hidden");
+
+  document.getElementById("resultadoTexto").innerHTML = `
+    Tiempo empleado: <strong>${tiempoSegundos} segundos</strong><br>
+    Respuestas correctas: <strong>${aciertos} de ${preguntas.length}</strong>
+  `;
+}
+
+function siguienteFase() {
+  faseActual++;
+
+  if (faseActual < fases.length) {
+    cargarFase();
+  } else {
+    mostrarInforme();
+  }
+}
+
+function mostrarInforme() {
+  document.getElementById("resultado").classList.add("hidden");
+  document.getElementById("informe").classList.remove("hidden");
+
+  const base = resultados[0];
+  let html = "";
+
+  resultados.forEach(r => {
+    const diferenciaTiempo = r.tiempo - base.tiempo;
+    const diferenciaAciertos = r.aciertos - base.aciertos;
+
+    html += `
+      <h3>${r.fase}</h3>
+      <p>
+        Tiempo: <strong>${r.tiempo} segundos</strong><br>
+        Comprensión: <strong>${r.aciertos}/${r.total}</strong>
+      </p>
+    `;
+
+    if (r !== base) {
+      html += `
+        <p>
+          Comparado con la lectura habitual:
+          necesitaste <strong>${diferenciaTiempo >= 0 ? diferenciaTiempo : 0} segundos más</strong>
+          y obtuviste <strong>${Math.abs(diferenciaAciertos)}</strong>
+          ${diferenciaAciertos < 0 ? "aciertos menos" : "aciertos más o iguales"}.
+        </p>
+      `;
+    }
+  });
+
+  html += `
+    <hr>
+    <p>
+      Esta experiencia muestra que, cuando la lectura se vuelve menos automática,
+      aumenta el esfuerzo mental. Eso puede provocar más cansancio, más lentitud
+      y más errores de comprensión.
+    </p>
+    <p>
+      Por eso algunas medidas de apoyo no son ventajas injustas, sino formas de reducir barreras:
+      más tiempo, textos claros, lectura en voz alta, fragmentar la información, usar apoyos visuales
+      o permitir diferentes formas de demostrar lo aprendido.
+    </p>
+  `;
+
+  document.getElementById("informeFinal").innerHTML = html;
+}
+
+function reiniciar() {
+  faseActual = 0;
+  resultados = [];
+
+  document.getElementById("informe").classList.add("hidden");
+  document.getElementById("inicio").classList.remove("hidden");
+}
+</script>
+
+</body>
+</html>
